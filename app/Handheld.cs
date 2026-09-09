@@ -464,7 +464,7 @@ namespace GHelper
             SetSoftwareKeyCombo(comboSoftware, textSoftware, binding);
             SetSoftwareKeyCombo(comboSoftwareSecondary, textSoftwareSecondary, binding + "_secondary");
 
-            bool supportsDoubleClick = binding == "m4";
+            bool supportsDoubleClick = binding == "m4" || binding == "cc";
             labelSoftwareDouble.Visible = supportsDoubleClick;
             comboSoftwareDouble.Visible = supportsDoubleClick;
             textSoftwareDouble.Visible = false;
@@ -530,7 +530,7 @@ namespace GHelper
 
         private void ComboSoftwareDouble_SelectedValueChanged(object? sender, EventArgs e)
         {
-            if (activeBinding != "m4") return;
+            if (activeBinding != "m4" && activeBinding != "cc") return;
 
             string action = comboSoftwareDouble.SelectedValue?.ToString() ?? "";
             if (action == "custom")
@@ -543,15 +543,15 @@ namespace GHelper
                 textSoftwareDouble.Visible = false;
             }
 
-            if (action != "") AppConfig.Set("m4_double", action);
-            else AppConfig.Remove("m4_double");
+            if (action != "") AppConfig.Set(activeBinding + "_double", action);
+            else AppConfig.Remove(activeBinding + "_double");
             VisualiseButton(activeButton, activeBinding, true);
         }
 
         private void TextSoftwareDouble_TextChanged(object? sender, EventArgs e)
         {
-            if (activeBinding != "m4") return;
-            AppConfig.Set("custom_m4_double", textSoftwareDouble.Text);
+            if (activeBinding != "m4" && activeBinding != "cc") return;
+            AppConfig.Set("custom_" + activeBinding + "_double", textSoftwareDouble.Text);
         }
 
 

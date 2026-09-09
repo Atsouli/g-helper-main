@@ -26,6 +26,9 @@ namespace GHelper.Input
         private static readonly object rogClickLock = new();
         private static System.Threading.Timer? rogClickTimer;
         private static int rogClickCount;
+        private static readonly object ccClickLock = new();
+        private static System.Threading.Timer? ccClickTimer;
+        private static int ccClickCount;
         private const int RogDoubleClickWindowMs = 350;
 
         public static Keys keyProfile = (Keys)AppConfig.Get("keybind_profile", (int)Keys.F5);
@@ -659,6 +662,45 @@ namespace GHelper.Input
             ExecuteAction(action, name);
         }
 
+        private static void HandleCcClick()
+        {
+            if (string.IsNullOrWhiteSpace(AppConfig.GetString("cc_double")))
+            {
+                KeyProcess("cc");
+                return;
+            }
+
+            lock (ccClickLock)
+            {
+                ccClickCount++;
+                if (ccClickCount == 1)
+                {
+                    ccClickTimer?.Dispose();
+                    ccClickTimer = new System.Threading.Timer(_ => CompleteCcSingleClick(), null,
+                        RogDoubleClickWindowMs, Timeout.Infinite);
+                    return;
+                }
+
+                ccClickCount = 0;
+                ccClickTimer?.Dispose();
+                ccClickTimer = null;
+            }
+
+            KeyProcess("cc_double");
+        }
+
+        private static void CompleteCcSingleClick()
+        {
+            lock (ccClickLock)
+            {
+                if (ccClickCount != 1) return;
+                ccClickCount = 0;
+                ccClickTimer?.Dispose();
+                ccClickTimer = null;
+            }
+            KeyProcess("cc");
+        }
+
         private static void HandleRogClick()
         {
             if (string.IsNullOrWhiteSpace(AppConfig.GetString("m4_double")))
@@ -1011,7 +1053,7 @@ namespace GHelper.Input
                         return;
                     // The Command Center ("play-looking") button below the select key.
                     case 166:
-                        KeyProcess("cc");
+                        HandleCcClick();
                         return;
                     // ROG long-press and long-press-release events.
                     case 167:

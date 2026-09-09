@@ -287,11 +287,11 @@ namespace GHelper.Overlay
             int fps = frameTime > 0 ? (int)Math.Round(1_000_000d / frameTime) : 0;
             UpdateFpsHistory(processId, fps);
             if (AppConfig.IsNotFalse("rtss_show_fps") && fps > 0)
-                lines.Add(Colorize(tags, 2, $"{api} {fps} FPS"));
+                lines.Add(Colorize(tags, 2, $"{api} {fps}"));
             if (AppConfig.IsNotFalse("rtss_show_fps_graph") && fps > 0 && version >= EmbeddedObjectsVersion)
-                lines.Add(Colorize(tags, 2, "FPS " + FpsGraphTag));
+                lines.Add(Colorize(tags, 2, FpsGraphTag));
             if (AppConfig.IsNotFalse("rtss_show_fps_low") && fpsHistory.Count > 0)
-                lines.Add(Colorize(tags, 2, $"1% LOW {CalculateOnePercentLow()} FPS"));
+                lines.Add(Colorize(tags, 2, $"1% LOW {CalculateOnePercentLow()}"));
             if (AppConfig.IsNotFalse("rtss_show_frametime") && frameTime > 0)
                 lines.Add(Colorize(tags, 6, "FT " +
                     (frameTime / 1000d).ToString("F1", CultureInfo.InvariantCulture) + "ms"));
