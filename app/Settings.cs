@@ -45,6 +45,7 @@ namespace GHelper
         private readonly RButton buttonRtssOverlay = new();
         private readonly RButton buttonRtssCustomize = new();
         private readonly List<CustomButtonDefinition> customButtons = new();
+        private Panel? settingsPerformanceColumn;
 
         private const string CustomButtonsConfigKey = "custom_buttons";
 
@@ -67,11 +68,15 @@ namespace GHelper
 
         bool sliderGammaIgnore = false;
         bool activateCheck = false;
+        bool applyingFullHeightLayout = false;
 
         public SettingsForm()
         {
 
             InitializeComponent();
+            SuspendLayout();
+            settingsTabs.SuspendLayout();
+            ConfigureSinglePageLayout();
             KeyPreview = true;
             InitTheme(true);
             EnableGlassBackdrop();
@@ -208,11 +213,13 @@ namespace GHelper
             pictureGPU.Click += PictureGPU_Click;
 
             VisibleChanged += SettingsForm_VisibleChanged;
+            Shown += (_, _) => FitToWorkingAreaHeight();
 
             gamepadNavigation = new GamepadNavigation(components,
                 () => Visible && (ContainsFocus || Form.ActiveForm == this),
                 NavigateDirection,
                 ActivateFocusedControl,
+                LongActivateFocusedControl,
                 HideAll,
                 ChangeSettingsTab);
 
@@ -345,6 +352,9 @@ namespace GHelper
 
             panelPerformance.Focus();
             InitVisual();
+            ApplyCompactSettingsSizing();
+            settingsTabs.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         private sealed class CustomButtonDefinition
@@ -372,7 +382,7 @@ namespace GHelper
                 }
             }
 
-            RenderCustomButtons();
+            RenderCustomButtons(false);
         }
 
         private void SaveCustomButtons()
@@ -381,14 +391,14 @@ namespace GHelper
             RenderCustomButtons();
         }
 
-        private void RenderCustomButtons()
+        private void RenderCustomButtons(bool performLayout = true)
         {
             tableCustomButtons.SuspendLayout();
             tableCustomButtons.Controls.Clear();
             tableCustomButtons.ColumnStyles.Clear();
             tableCustomButtons.RowStyles.Clear();
             const int columnCount = 2;
-            const int cardRowHeight = 116;
+            const int cardRowHeight = 78;
             tableCustomButtons.ColumnCount = columnCount;
             tableCustomButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableCustomButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -428,84 +438,35 @@ namespace GHelper
                         BackColor = buttonMain,
                         ForeColor = foreMain,
                         Activated = false,
-                        Borderless = true,
+                        Borderless = false,
                         BorderRadius = 8
                     };
+                    run.FlatAppearance.BorderColor = Color.FromArgb(120, colorStandard);
                     run.AccessibleName = definition.Name + ": " + definition.Action;
                     toolTip.SetToolTip(run, definition.Action);
                     run.Click += (_, _) => InputDispatcher.RunCustomAction(definition.Action);
-
-                    var edit = CreateCustomButton("Edit", true, 30);
-                    edit.Click += (_, _) => EditCustomButton(definition);
-
-                    var remove = CreateCustomButton("Delete", true, 30);
-                    remove.ForeColor = colorTurbo;
-                    remove.Click += (_, _) => RemoveCustomButton(definition);
-
-                    var actions = new TableLayoutPanel
-                    {
-                        ColumnCount = 2,
-                        RowCount = 1,
-                        Dock = DockStyle.Fill,
-                        Margin = new Padding(0),
-                        BackColor = Color.Transparent
-                    };
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-                    actions.Controls.Add(edit, 0, 0);
-                    actions.Controls.Add(remove, 1, 0);
-
-                    var content = new TableLayoutPanel
-                    {
-                        ColumnCount = 1,
-                        RowCount = 2,
-                        Dock = DockStyle.Fill,
-                        Margin = new Padding(0),
-                        Padding = new Padding(0),
-                        BackColor = Color.Transparent
-                    };
-                    content.RowStyles.Add(new RowStyle(SizeType.Percent, 64F));
-                    content.RowStyles.Add(new RowStyle(SizeType.Percent, 36F));
-                    content.Controls.Add(run, 0, 0);
-                    content.Controls.Add(actions, 0, 1);
+                    run.EditRequested += (_, _) => EditCustomButton(definition);
+                    run.DeleteRequested += (_, _) => RemoveCustomButton(definition);
 
                     var card = new RGlassPanel
                     {
                         Dock = DockStyle.Fill,
                         Margin = new Padding(5),
-                        Padding = new Padding(7),
+                        Padding = new Padding(3),
                         BackColor = Color.Transparent,
                         CornerRadius = 10
                     };
-                    card.Controls.Add(content);
+                    card.Controls.Add(run);
                     tableCustomButtons.Controls.Add(card, column, row);
                 }
             }
 
-            tableCustomButtons.ResumeLayout(true);
-            panelCustomButtons.PerformLayout();
-            PerformLayout();
-        }
-
-        private static RButton CreateCustomButton(string text, bool secondary, int minimumHeight = 48)
-        {
-            var button = new RButton
+            tableCustomButtons.ResumeLayout(performLayout);
+            if (performLayout)
             {
-                Text = text,
-                AutoEllipsis = true,
-                Dock = DockStyle.Fill,
-                Margin = new Padding(2),
-                MinimumSize = new Size(0, minimumHeight),
-                BackColor = secondary ? buttonSecond : buttonMain,
-                ForeColor = foreMain,
-                BorderColor = Color.Transparent,
-                BorderRadius = 7,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 7.5F, FontStyle.Regular),
-                Secondary = secondary
-            };
-            button.FlatAppearance.BorderColor = Color.FromArgb(95, colorStandard);
-            return button;
+                panelCustomButtons.PerformLayout();
+                PerformLayout();
+            }
         }
 
         private void ButtonAddCustom_Click(object? sender, EventArgs e)
@@ -822,7 +783,7 @@ namespace GHelper
             buttonRtssOverlay.Text = "RTSS OSD";
             buttonRtssOverlay.AccessibleName = "RTSS in-game overlay";
             buttonRtssOverlay.Dock = DockStyle.Fill;
-            buttonRtssOverlay.Margin = new Padding(4);
+            buttonRtssOverlay.Margin = new Padding(2);
             buttonRtssOverlay.BackColor = buttonMain;
             buttonRtssOverlay.ForeColor = foreMain;
             buttonRtssOverlay.BorderColor = colorStandard;
@@ -837,13 +798,14 @@ namespace GHelper
             buttonRtssCustomize.Text = "Customize";
             buttonRtssCustomize.AccessibleName = "Customize RTSS overlay metrics";
             buttonRtssCustomize.Dock = DockStyle.Fill;
-            buttonRtssCustomize.Margin = new Padding(4);
+            buttonRtssCustomize.Margin = new Padding(2);
             buttonRtssCustomize.BackColor = buttonSecond;
             buttonRtssCustomize.ForeColor = foreMain;
             buttonRtssCustomize.BorderColor = colorStandard;
             buttonRtssCustomize.BorderRadius = 5;
             buttonRtssCustomize.Secondary = true;
             buttonRtssCustomize.Click += (_, _) => ShowRtssOverlaySettings();
+            buttonOverlay.Margin = new Padding(2);
 
             var overlayButtons = new TableLayoutPanel
             {
@@ -864,10 +826,10 @@ namespace GHelper
             {
                 Text = "In-game Overlay",
                 Dock = DockStyle.Top,
-                Height = 34,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                Height = 26,
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                 ForeColor = foreMain,
-                Padding = new Padding(8, 0, 0, 0),
+                Padding = new Padding(4, 0, 0, 0),
                 TextAlign = ContentAlignment.MiddleLeft
             };
 
@@ -875,15 +837,15 @@ namespace GHelper
             {
                 Name = "panelOverlayControls",
                 Dock = DockStyle.Top,
-                Height = 132,
+                Height = 96,
                 Margin = new Padding(0),
-                Padding = new Padding(20, 12, 20, 14),
+                Padding = new Padding(10, 6, 10, 8),
                 BackColor = Color.Transparent,
                 AccessibleName = "In-game Overlay"
             };
             overlayPanel.Controls.Add(overlayButtons);
             overlayPanel.Controls.Add(title);
-            tabPerformance.Controls.Add(overlayPanel);
+            (settingsPerformanceColumn ?? tabPerformance).Controls.Add(overlayPanel);
         }
 
         private void ButtonHandheld_Click(object? sender, EventArgs e)
@@ -1014,8 +976,108 @@ namespace GHelper
                 return;
             }
 
-            Left = Screen.FromControl(this).WorkingArea.Width - 10 - Width;
-            Top = Screen.FromControl(this).WorkingArea.Height - 10 - Height;
+            FitToWorkingAreaHeight();
+        }
+
+        public void FitToWorkingAreaHeight(Screen? targetScreen = null)
+        {
+            if (applyingFullHeightLayout || IsDisposed) return;
+
+            Rectangle area = (targetScreen ?? Screen.FromControl(this)).WorkingArea;
+            int halfWidth = area.Width / 2;
+            Rectangle fullHeightBounds = new(
+                area.Right - halfWidth,
+                area.Top,
+                halfWidth,
+                area.Height);
+
+            if (Bounds == fullHeightBounds) return;
+            applyingFullHeightLayout = true;
+            try
+            {
+                Bounds = fullHeightBounds;
+            }
+            finally
+            {
+                applyingFullHeightLayout = false;
+            }
+        }
+
+        private void ConfigureSinglePageLayout()
+        {
+            settingsTabs.HideSingleTabHeader = true;
+            tabPerformance.Text = "";
+            tabPerformance.AutoScroll = false;
+            tabPerformance.Padding = new Padding(6);
+
+            var dashboard = new TableLayoutPanel
+            {
+                Name = "settingsDashboard",
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent,
+                ColumnCount = 2,
+                RowCount = 1,
+                Padding = new Padding(0),
+                Margin = new Padding(0)
+            };
+            dashboard.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            dashboard.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            dashboard.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            Panel leftColumn = CreateSettingsColumn("settingsColumnPerformance");
+            Panel rightColumn = CreateSettingsColumn("settingsColumnDevices");
+            settingsPerformanceColumn = leftColumn;
+            dashboard.SuspendLayout();
+            leftColumn.SuspendLayout();
+            rightColumn.SuspendLayout();
+
+            // Controls are added bottom-to-top because every settings card is DockStyle.Top.
+            leftColumn.Controls.AddRange([
+                panelMatrix, panelRearLight, panelKeyboard, panelGamma,
+                panelScreen, panelOrientation, panelGPU, panelPerformance
+            ]);
+            rightColumn.Controls.AddRange([
+                panelFooter, panelCustomButtons, panelVersion, panelStartup,
+                panelPeripherals, panelAlly, panelBattery, panelController
+            ]);
+
+            dashboard.Controls.Add(leftColumn, 0, 0);
+            dashboard.Controls.Add(rightColumn, 1, 0);
+            tabPerformance.Controls.Clear();
+            tabPerformance.Controls.Add(dashboard);
+            rightColumn.ResumeLayout(false);
+            leftColumn.ResumeLayout(false);
+            dashboard.ResumeLayout(false);
+        }
+
+        private static Panel CreateSettingsColumn(string name) => new()
+        {
+            Name = name,
+            Dock = DockStyle.Fill,
+            AutoScroll = true,
+            BackColor = Color.Transparent,
+            Padding = new Padding(5),
+            Margin = new Padding(4)
+        };
+
+        private void ApplyCompactSettingsSizing()
+        {
+            const float compactScale = 0.82F;
+            SizeF scale = new(compactScale, compactScale);
+            Control[] sections =
+            [
+                panelPerformance, panelGPU, panelOrientation, panelScreen,
+                panelGamma, panelKeyboard, panelRearLight, panelMatrix,
+                panelController, panelBattery, panelAlly, panelPeripherals,
+                panelStartup, panelVersion, panelCustomButtons, panelFooter
+            ];
+
+            foreach (Control section in sections)
+            {
+                section.SuspendLayout();
+                section.Scale(scale);
+                section.ResumeLayout(false);
+            }
         }
 
         private void PanelBattery_MouseEnter(object? sender, EventArgs e)
@@ -1121,9 +1183,11 @@ namespace GHelper
 
         private void FocusFirstControl()
         {
-            Control? first = GetNavigableControls().OrderBy(c => c.RectangleToScreen(c.ClientRectangle).Top)
-                .ThenBy(c => c.RectangleToScreen(c.ClientRectangle).Left)
-                .FirstOrDefault();
+            // The single-page dashboard has a stable first action. Avoid walking and
+            // sorting the complete control tree every time the window becomes visible.
+            Control? first = buttonSilent.Visible && buttonSilent.Enabled && buttonSilent.CanSelect
+                ? buttonSilent
+                : GetNavigableControls().FirstOrDefault();
             if (first != null)
             {
                 first.Select();
@@ -1238,6 +1302,17 @@ namespace GHelper
                     focused?.Select();
                     break;
             }
+        }
+
+        private bool LongActivateFocusedControl()
+        {
+            if (GetFocusedControl() is RShortcutTile tile)
+            {
+                tile.RequestEdit();
+                return true;
+            }
+
+            return false;
         }
 
         private Control? GetFocusedControl()
@@ -2398,7 +2473,10 @@ namespace GHelper
             AppConfig.Set("overlay", enable ? 1 : 0);
             Logger.WriteLine("Overlay " + (enable ? "On" : "Off") + (AppConfig.IsOverlayGameOnly() ? " (game only)" : ""));
             if (enable)
+            {
+                Program.hardwareOverlay ??= new HardwareOverlay();
                 Program.hardwareOverlay?.StartOverlay();
+            }
             else
                 Program.hardwareOverlay?.StopOverlay();
 
@@ -2415,6 +2493,7 @@ namespace GHelper
             bool enable = !AppConfig.Is("rtss_overlay");
             if (enable)
             {
+                Program.rtssOverlay ??= new RtssOverlay();
                 if (AppConfig.IsOverlay())
                 {
                     Program.hardwareOverlay?.StopOverlay();
@@ -2456,6 +2535,7 @@ namespace GHelper
             AppConfig.Set("overlay_game_only", AppConfig.IsOverlayGameOnly() ? 0 : 1);
             if (AppConfig.IsOverlay())
             {
+                Program.hardwareOverlay ??= new HardwareOverlay();
                 Program.hardwareOverlay?.StopOverlay();
                 Program.hardwareOverlay?.StartOverlay();
             }

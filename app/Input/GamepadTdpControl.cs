@@ -1,11 +1,13 @@
 using System.Runtime.InteropServices;
 using GHelper.Helpers;
+using GHelper.Mode;
 
 namespace GHelper.Input
 {
     /// <summary>
     /// Global handheld controller chords:
     /// - Hold both triggers and press D-pad Left/Right for a one-watt TDP step.
+    /// - Hold ROG and use D-pad Up/Down for GPU clock or Left/Right for CPU max frequency.
     /// - In gamepad mode, hold a rear paddle and use the right stick as a mouse.
     /// - In desktop mode, hold a rear paddle and move the left stick for Q/E/R/T.
     /// - In desktop mode, hold a rear paddle and move the right stick to adjust brightness or scroll.
@@ -14,10 +16,15 @@ namespace GHelper.Input
     {
         private const ushort DPadLeft = 0x0004;
         private const ushort DPadRight = 0x0008;
+        private const ushort DPadUp = 0x0001;
+        private const ushort DPadDown = 0x0002;
         private const ushort HorizontalDirections = DPadLeft | DPadRight;
+        private const ushort AllDirections = DPadUp | DPadDown | DPadLeft | DPadRight;
         private const byte TriggerThreshold = 180;
         private const int TdpRepeatDelayMs = 450;
         private const int TdpRepeatIntervalMs = 120;
+        private const int FrequencyRepeatDelayMs = 450;
+        private const int FrequencyRepeatIntervalMs = 140;
         private const double MouseDeadzone = 0.16;
         private const double MouseSpeed = 26.0;
         private const uint MouseEventMove = 0x0001;
@@ -29,6 +36,9 @@ namespace GHelper.Input
         private const int WheelDelta = 120;
         private const int MouseGestureThreshold = 28;
         private const int BrightnessRepeatMs = 160;
+        private const int ScrollRepeatMs = 90;
+        private const int ScrollDirectionDebounceMs = 100;
+        private const double GestureAxisDominance = 1.35;
         private const int WhKeyboardLowLevel = 13;
         private const int WhMouseLowLevel = 14;
         private const int WmMouseMove = 0x0200;
@@ -40,6 +50,9 @@ namespace GHelper.Input
         private readonly System.Windows.Forms.Timer timer = new() { Interval = 16 };
         private ushort repeatingTdpDirection;
         private long nextTdpRepeatAt;
+        private ushort repeatingFrequencyDirection;
+        private long nextFrequencyRepeatAt;
+        private bool frequencyElevationRequested;
         private readonly LowLevelKeyboardProc keyboardProc;
         private readonly LowLevelMouseProc mouseProc;
         private readonly HashSet<int> suppressedDesktopStickKeys = [];
@@ -48,6 +61,10 @@ namespace GHelper.Input
         private int desktopMouseX;
         private int desktopMouseY;
         private long nextBrightnessAt;
+        private long nextScrollAt;
+        private long scrollDirectionChangedAt;
+        private int pendingScrollDirection;
+        private int scrollEventQueued;
         private int controllerIndex = -1;
         private double mouseRemainderX;
         private double mouseRemainderY;
@@ -72,11 +89,13 @@ namespace GHelper.Input
             if (!TryReadGamepad(out XInputGamepad gamepad))
             {
                 repeatingTdpDirection = 0;
+                ResetFrequencyChord();
                 return;
             }
 
             bool bothTriggers = gamepad.LeftTrigger >= TriggerThreshold &&
-                                gamepad.RightTrigger >= TriggerThreshold;
+                                gamepad.RightTrigger >= TriggerThreshold &&
+                                !InputDispatcher.isRogLongPressed;
             ushort chordDirections = bothTriggers
                 ? (ushort)(gamepad.Buttons & HorizontalDirections)
                 : (ushort)0;
@@ -101,7 +120,76 @@ namespace GHelper.Input
                 nextTdpRepeatAt = now + TdpRepeatIntervalMs;
             }
 
+            HandleFrequencyChord(gamepad, now);
             HandlePaddleMouse(gamepad);
+        }
+
+        private void HandleFrequencyChord(XInputGamepad gamepad, long now)
+        {
+            if (!ModeControl.IsAllyZ1Extreme() || !InputDispatcher.isRogLongPressed)
+            {
+                ResetFrequencyChord();
+                return;
+            }
+
+            ushort pressed = (ushort)(gamepad.Buttons & AllDirections);
+            ushort direction = (pressed & DPadUp) != 0 ? DPadUp :
+                (pressed & DPadDown) != 0 ? DPadDown :
+                (pressed & DPadRight) != 0 ? DPadRight :
+                (ushort)(pressed & DPadLeft);
+
+            if (direction == 0)
+            {
+                ResetFrequencyChord();
+                return;
+            }
+
+            if (direction != repeatingFrequencyDirection)
+            {
+                AdjustFrequency(direction);
+                repeatingFrequencyDirection = direction;
+                nextFrequencyRepeatAt = now + FrequencyRepeatDelayMs;
+            }
+            else if (now >= nextFrequencyRepeatAt)
+            {
+                AdjustFrequency(direction);
+                nextFrequencyRepeatAt = now + FrequencyRepeatIntervalMs;
+            }
+        }
+
+        private void AdjustFrequency(ushort direction)
+        {
+            if (direction is DPadUp or DPadDown)
+            {
+                // A non-elevated instance cannot safely keep changing the SMU value while
+                // the one elevated apply request is starting. Allow one step per hold there.
+                if (!ProcessHelper.IsUserAdministrator() && frequencyElevationRequested) return;
+                bool requestElevation = !frequencyElevationRequested;
+                int mhz = Program.modeControl.AdjustAllyGpuFrequency(direction == DPadUp ? 1 : -1,
+                    requestElevation);
+                if (!ProcessHelper.IsUserAdministrator()) frequencyElevationRequested = true;
+                Program.toast.RunToast($"GPU Clock {mhz} MHz", ToastIcon.Controller);
+                return;
+            }
+
+            if (!ProcessHelper.IsUserAdministrator() && frequencyElevationRequested) return;
+            bool requestCpuElevation = !frequencyElevationRequested;
+            (int cpuMhz, bool applied, bool elevationRequested) = Program.modeControl.AdjustAllyCpuFrequency(
+                direction == DPadRight ? 1 : -1, requestCpuElevation);
+            if (elevationRequested) frequencyElevationRequested = true;
+
+            string message = applied
+                ? $"CPU Max {cpuMhz} MHz"
+                : elevationRequested
+                    ? $"CPU Max {cpuMhz} MHz - applying as administrator"
+                    : $"CPU limit failed: {cpuMhz} MHz";
+            Program.toast.RunToast(message, ToastIcon.Controller);
+        }
+
+        private void ResetFrequencyChord()
+        {
+            repeatingFrequencyDirection = 0;
+            frequencyElevationRequested = false;
         }
 
         private IntPtr DesktopStickKeyboardHook(int code, IntPtr message, IntPtr data)
@@ -145,11 +233,26 @@ namespace GHelper.Input
                 Point cursor = Cursor.Position;
                 int dx = mouse.Point.X - cursor.X;
                 int dy = mouse.Point.Y - cursor.Y;
+                int absX = Math.Abs(dx);
+                int absY = Math.Abs(dy);
 
-                if (Math.Abs(dx) >= Math.Abs(dy))
+                // Ignore diagonal/noisy samples until one gesture axis is clearly dominant.
+                // This prevents a stick near the diagonal from alternating brightness and
+                // opposite wheel events on every mouse-hook callback.
+                bool horizontal = absX >= absY * GestureAxisDominance;
+                bool vertical = absY >= absX * GestureAxisDominance;
+                if (!horizontal && !vertical)
+                {
+                    desktopMouseX = 0;
+                    desktopMouseY = 0;
+                    return (IntPtr)1;
+                }
+
+                if (horizontal)
                 {
                     desktopMouseX += dx;
                     desktopMouseY = 0;
+                    pendingScrollDirection = 0;
                     long now = Environment.TickCount64;
                     if (Math.Abs(desktopMouseX) >= MouseGestureThreshold && now >= nextBrightnessAt)
                     {
@@ -162,11 +265,22 @@ namespace GHelper.Input
                 {
                     desktopMouseY += dy;
                     desktopMouseX = 0;
-                    if (Math.Abs(desktopMouseY) >= MouseGestureThreshold)
+                    long now = Environment.TickCount64;
+                    int direction = desktopMouseY < 0 ? 1 : -1;
+
+                    if (direction != pendingScrollDirection)
                     {
-                        int wheel = desktopMouseY < 0 ? WheelDelta : -WheelDelta;
-                        mouse_event(MouseEventWheel, 0, 0, unchecked((uint)wheel), UIntPtr.Zero);
+                        pendingScrollDirection = direction;
+                        scrollDirectionChangedAt = now;
+                        desktopMouseY = Math.Sign(desktopMouseY) * Math.Min(Math.Abs(desktopMouseY), MouseGestureThreshold);
+                    }
+                    else if (Math.Abs(desktopMouseY) >= MouseGestureThreshold &&
+                             now >= nextScrollAt &&
+                             now - scrollDirectionChangedAt >= ScrollDirectionDebounceMs)
+                    {
+                        QueueMouseWheel(direction * WheelDelta);
                         desktopMouseY = 0;
+                        nextScrollAt = now + ScrollRepeatMs;
                     }
                 }
 
@@ -177,8 +291,26 @@ namespace GHelper.Input
             {
                 desktopMouseX = 0;
                 desktopMouseY = 0;
+                pendingScrollDirection = 0;
             }
             return CallNextHookEx(mouseHook, code, message, data);
+        }
+
+        private void QueueMouseWheel(int wheel)
+        {
+            if (Interlocked.Exchange(ref scrollEventQueued, 1) != 0) return;
+
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                try
+                {
+                    mouse_event(MouseEventWheel, 0, 0, unchecked((uint)wheel), UIntPtr.Zero);
+                }
+                finally
+                {
+                    Volatile.Write(ref scrollEventQueued, 0);
+                }
+            });
         }
 
         private void HandlePaddleMouse(XInputGamepad gamepad)

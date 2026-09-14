@@ -5,6 +5,25 @@ namespace GHelper.UI
     public sealed class RTabControl : TabControl
     {
         private bool fittingTabs;
+        private bool hideSingleTabHeader;
+
+        public bool HideSingleTabHeader
+        {
+            get => hideSingleTabHeader;
+            set
+            {
+                if (hideSingleTabHeader == value) return;
+                hideSingleTabHeader = value;
+                FitAllTabs();
+                Invalidate();
+            }
+        }
+
+        private bool IsSingleTabHeaderHidden => hideSingleTabHeader && TabCount == 1;
+
+        public override Rectangle DisplayRectangle => IsSingleTabHeaderHidden
+            ? new Rectangle(0, 0, Width, Height)
+            : base.DisplayRectangle;
 
         public RTabControl()
         {
@@ -23,6 +42,12 @@ namespace GHelper.UI
             fittingTabs = true;
             try
             {
+                if (IsSingleTabHeaderHidden)
+                {
+                    ItemSize = new Size(1, 1);
+                    return;
+                }
+
                 int dpi = IsHandleCreated ? DeviceDpi : 96;
                 int reserve = Math.Max(8, dpi / 8);
                 int tabWidth = Math.Max(56, (ClientSize.Width - reserve) / TabCount);
@@ -61,6 +86,8 @@ namespace GHelper.UI
 
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
+            if (IsSingleTabHeaderHidden) return;
+
             bool selected = e.Index == SelectedIndex;
             Rectangle bounds = GetTabRect(e.Index);
             bounds.Inflate(-3, -4);

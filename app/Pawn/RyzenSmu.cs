@@ -145,6 +145,7 @@ namespace PawnIO
         public bool CanSetTDP()   => _cpu is not CpuCodeName.Undefined;
         public bool CanSetCoAll() => _cpu is not CpuCodeName.Undefined;
         public bool CanSetThm()   => _cpu is not CpuCodeName.Undefined;
+        public bool CanSetGfxClock() => _cpu == CpuCodeName.Phoenix;
 
         public bool SetAllLimits(int stapmW, int fastW, int slowW)
             => SetStapm(stapmW) == SmuStatus.OK & SetFast(fastW) == SmuStatus.OK & SetSlow(slowW) == SmuStatus.OK;
@@ -202,6 +203,24 @@ namespace PawnIO
                 // StrixPoint/KrackanPoint: no set-cogfx in UXTU or RyzenAdj
                 _                                                => SmuStatus.Failed,
             };
+        }
+
+        /// <summary>
+        /// Sets a fixed iGPU clock on Phoenix (including Z1 Extreme).
+        /// The firmware interface uses the paired GFX clock messages used by UXTU: a soft
+        /// maximum followed by a hard minimum. Automatic mode restores the Z1 Extreme's
+        /// normal 2700 MHz ceiling and clears the hard minimum.
+        /// </summary>
+        public SmuStatus SetGfxClock(int mhz)
+        {
+            if (!CanSetGfxClock() || mhz < 0) return SmuStatus.Failed;
+
+            uint maximum = (uint)(mhz == 0 ? 2700 : mhz);
+            uint minimum = (uint)mhz;
+            SmuStatus max = SendPsmu(0x89, maximum);
+            SmuStatus min = SendPsmu(0x1C, minimum);
+            return max == SmuStatus.OK && min == SmuStatus.OK ? SmuStatus.OK :
+                max != SmuStatus.OK ? max : min;
         }
 
         public SmuStatus SetThm(int celsius)

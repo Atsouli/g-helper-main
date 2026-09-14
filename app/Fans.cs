@@ -27,6 +27,10 @@ namespace GHelper
         static bool fanRpm = true;
         readonly RCheckBox checkFanStop80 = new();
         readonly RCheckBox checkFanFullPower = new();
+        readonly Panel panelAllyFrequency = new();
+        readonly RComboBox comboAllyCpuFrequency = new();
+        readonly RComboBox comboAllyGpuFrequency = new();
+        bool _loadingAllyFrequencies;
 
         static readonly Font _axisFont = new Font("Arial", 7F);
 
@@ -102,6 +106,8 @@ namespace GHelper
             labelHysteresisDown.Text = Properties.Strings.HysteresisDown;
             buttonReadLimits.Text = Properties.Strings.ReadLimits;
             buttonDownload.Text = Properties.Strings.InstallPawnIODriver;
+
+            BuildAllyFrequencyControls();
 
             InitTheme(true);
 
@@ -401,6 +407,122 @@ namespace GHelper
             InitPowerPlan();
             InitUV();
             InitGPU();
+            InitAllyFrequencies();
+        }
+
+        private void BuildAllyFrequencyControls()
+        {
+            if (!ModeControl.IsAllyZ1Extreme()) return;
+
+            panelAllyFrequency.AutoSize = false;
+            panelAllyFrequency.Height = 150;
+            panelAllyFrequency.Dock = DockStyle.Top;
+            panelAllyFrequency.Padding = new Padding(15, 8, 15, 10);
+            panelAllyFrequency.AccessibleName = "ROG Ally Z1 Extreme frequency controls";
+
+            var layout = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                RowCount = 3,
+                Margin = Padding.Empty,
+                Padding = Padding.Empty
+            };
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+
+            var title = new Label
+            {
+                Text = "ROG Ally Z1 Extreme frequencies",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft,
+                AutoEllipsis = true
+            };
+            layout.Controls.Add(title, 0, 0);
+            layout.SetColumnSpan(title, 2);
+
+            ConfigureFrequencyCombo(comboAllyCpuFrequency, "CPU maximum frequency");
+            ConfigureFrequencyCombo(comboAllyGpuFrequency, "GPU fixed frequency");
+            comboAllyCpuFrequency.Items.Add("Automatic");
+            for (int value = 1400; value <= 5100; value += 100)
+                comboAllyCpuFrequency.Items.Add($"{value} MHz");
+            comboAllyGpuFrequency.Items.Add("Automatic");
+            for (int value = 400; value <= 2700; value += 100)
+                comboAllyGpuFrequency.Items.Add($"{value} MHz");
+
+            layout.Controls.Add(CreateFrequencyLabel("CPU max (MHz)"), 0, 1);
+            layout.Controls.Add(comboAllyCpuFrequency, 1, 1);
+            layout.Controls.Add(CreateFrequencyLabel("GPU clock (MHz)"), 0, 2);
+            layout.Controls.Add(comboAllyGpuFrequency, 1, 2);
+            panelAllyFrequency.Controls.Add(layout);
+            panelAdvanced.Controls.Add(panelAllyFrequency);
+            panelAllyFrequency.BringToFront();
+
+            comboAllyCpuFrequency.SelectedIndexChanged += AllyFrequencyChanged;
+            comboAllyGpuFrequency.SelectedIndexChanged += AllyFrequencyChanged;
+        }
+
+        private static Label CreateFrequencyLabel(string text) => new()
+        {
+            Text = text,
+            Dock = DockStyle.Fill,
+            TextAlign = ContentAlignment.MiddleLeft,
+            AutoEllipsis = true
+        };
+
+        private static void ConfigureFrequencyCombo(RComboBox combo, string accessibleName)
+        {
+            combo.Dock = DockStyle.Fill;
+            combo.DropDownStyle = ComboBoxStyle.DropDownList;
+            combo.Margin = new Padding(4, 4, 0, 4);
+            combo.AccessibleName = accessibleName;
+            combo.TabStop = true;
+        }
+
+        private void InitAllyFrequencies()
+        {
+            if (!ModeControl.IsAllyZ1Extreme() || comboAllyCpuFrequency.Items.Count == 0) return;
+
+            _loadingAllyFrequencies = true;
+            comboAllyGpuFrequency.Enabled = ModeControl.IsPawnInstalled();
+            SelectFrequency(comboAllyCpuFrequency, AppConfig.GetMode("ally_cpu_frequency", 0), 1400, 5100);
+            SelectFrequency(comboAllyGpuFrequency, AppConfig.GetMode("ally_gpu_frequency", 0), 400, 2700);
+            _loadingAllyFrequencies = false;
+        }
+
+        private static void SelectFrequency(ComboBox combo, int value, int minimum, int maximum)
+        {
+            if (value < minimum || value > maximum || value % 100 != 0)
+                combo.SelectedIndex = 0;
+            else
+                combo.SelectedItem = $"{value} MHz";
+        }
+
+        private void AllyFrequencyChanged(object? sender, EventArgs e)
+        {
+            if (_loadingAllyFrequencies || comboAllyCpuFrequency.SelectedIndex < 0 || comboAllyGpuFrequency.SelectedIndex < 0)
+                return;
+
+            int cpuMhz = ParseFrequency(comboAllyCpuFrequency);
+            int gpuMhz = ParseFrequency(comboAllyGpuFrequency);
+            AppConfig.SetMode("ally_cpu_frequency", cpuMhz);
+            AppConfig.SetMode("ally_gpu_frequency", gpuMhz);
+            if (cpuMhz is >= 1400 and <= 5100)
+                AppConfig.SetMode("ally_cpu_frequency_manual", cpuMhz);
+            if (gpuMhz is >= 400 and <= 2700)
+                AppConfig.SetMode("ally_gpu_frequency_manual", gpuMhz);
+            modeControl.ApplyAllyFrequencyLimits(true);
+        }
+
+        private static int ParseFrequency(ComboBox combo)
+        {
+            string text = combo.SelectedItem?.ToString() ?? string.Empty;
+            string token = text.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? string.Empty;
+            return int.TryParse(token, out int value) ? value : 0;
         }
 
         public void InitCPU()

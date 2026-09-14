@@ -19,6 +19,7 @@ public static class AsusHid
     static HidStream? auraStream;
     static int auraFeatLen;
     static byte[]? auraScratch;
+    static readonly HashSet<int> loggedDiscoveredAuraPids = [];
 
     static void EnsureAuraStream()
     {
@@ -40,21 +41,30 @@ public static class AsusHid
     public static IEnumerable<HidDevice>? FindDevices(byte reportId, int[]? pids = null)
     {
         IEnumerable<HidDevice> deviceList;
+        HashSet<int> discoveredAuraPids = [];
 
         try
         {
             var allDevices = DeviceList.Local.GetHidDevices(ASUS_ID);
-            var filteredDevices = new List<HidDevice>();
+            var configuredDevices = new List<HidDevice>();
+            var discoveredDevices = new List<HidDevice>();
+            bool discoverAllyAura = AppConfig.IsAlly() && reportId == AURA_ID &&
+                (pids is null || ReferenceEquals(pids, MAIN_AURA_PIDS) || pids.SequenceEqual(MAIN_AURA_PIDS));
 
             foreach (var device in allDevices)
             {
                 try
                 {
-                    if ((pids != null ? pids.Contains(device.ProductID) : ALL_PIDS.Contains(device.ProductID)) &&
-                        device.CanOpen &&
-                        device.GetMaxFeatureReportLength() > 0)
+                    bool configuredPid = pids != null ? pids.Contains(device.ProductID) : ALL_PIDS.Contains(device.ProductID);
+                    if (!configuredPid && !discoverAllyAura) continue;
+                    if (!device.CanOpen || device.GetMaxFeatureReportLength() <= 0) continue;
+
+                    if (configuredPid)
+                        configuredDevices.Add(device);
+                    else
                     {
-                        filteredDevices.Add(device);
+                        discoveredDevices.Add(device);
+                        discoveredAuraPids.Add(device.ProductID);
                     }
                 }
                 catch (Exception ex)
@@ -63,7 +73,9 @@ public static class AsusHid
                 }
             }
 
-            deviceList = filteredDevices;
+            // Always prefer a known Aura device. Unknown ASUS devices are considered on
+            // Ally only and are still validated against the requested HID report below.
+            deviceList = configuredDevices.Concat(discoveredDevices);
         }
         catch (Exception ex)
         {
@@ -82,7 +94,18 @@ public static class AsusHid
             {
                 //Logger.WriteLine($"Error getting report descriptor for device {device.ProductID.ToString("X")}: {ex.Message}");
             }
-            if (isValid) yield return device;
+            if (isValid)
+            {
+                if (discoveredAuraPids.Contains(device.ProductID))
+                {
+                    lock (loggedDiscoveredAuraPids)
+                    {
+                        if (loggedDiscoveredAuraPids.Add(device.ProductID))
+                            Logger.WriteLine($"Ally Aura device discovered: PID={device.ProductID:X4}");
+                    }
+                }
+                yield return device;
+            }
         }
     }
 
@@ -296,4 +319,3 @@ public static class AsusHid
     }
 
 }
-

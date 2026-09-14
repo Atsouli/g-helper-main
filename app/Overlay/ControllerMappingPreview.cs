@@ -1,5 +1,6 @@
 using GHelper.Ally;
 using GHelper.Helpers;
+using GHelper.Mode;
 using System.Drawing.Drawing2D;
 
 namespace GHelper.Overlay
@@ -162,26 +163,38 @@ namespace GHelper.Overlay
             List<(string Chord, string Action)> shortcuts = AllyControl.IsGamepadMode
                 ?
                 [
+                    ("Hold ROG + D-Pad ↑/↓", "GPU clock +/- 100 MHz"),
+                    ("Hold ROG + D-Pad ←/→", "CPU max -/+ 100 MHz"),
                     ("L2+R2 + D-Pad ←/→", "TDP -/+ 1 W (hold)"),
                     ("M1/M2 + Right stick", "Mouse cursor"),
                     ("M1/M2 + R2", "Left mouse click"),
-                    ("M1/M2 + L2", "Right mouse click"),
-                    ("Hold ROG", "Controls preview")
+                    ("M1/M2 + L2", "Right mouse click")
                 ]
                 :
                 [
+                    ("Hold ROG + D-Pad ↑/↓", "GPU clock +/- 100 MHz"),
+                    ("Hold ROG + D-Pad ←/→", "CPU max -/+ 100 MHz"),
                     ("M1/M2 + Left stick", "↑Q  →E  ↓R  ←T"),
                     ("M1/M2 + R-stick ←/→", "Brightness"),
-                    ("M1/M2 + R-stick ↑/↓", "Scroll"),
-                    ("Hold ROG", "Controls preview")
+                    ("M1/M2 + R-stick ↑/↓", "Scroll")
                 ];
 
-            string doubleAction = RogDoubleClickActionName();
-            if (!string.IsNullOrWhiteSpace(doubleAction))
-                shortcuts.Add(("Double ROG", doubleAction));
+            string ccSecondaryAction = ShortcutActionName("cc_secondary");
+            if (!string.IsNullOrWhiteSpace(ccSecondaryAction))
+                shortcuts.Add(("M1/M2 + Command", ccSecondaryAction));
 
-            const float lineHeight = 28f;
-            const float chordWidth = 137f;
+            string rogDoubleAction = ShortcutActionName("m4_double");
+            if (!string.IsNullOrWhiteSpace(rogDoubleAction))
+                shortcuts.Add(("Double ROG", rogDoubleAction));
+
+            string ccDoubleAction = ShortcutActionName("cc_double");
+            if (string.IsNullOrWhiteSpace(ccDoubleAction) && ModeControl.IsAllyZ1Extreme())
+                ccDoubleAction = "Automatic / Manual clocks";
+            if (!string.IsNullOrWhiteSpace(ccDoubleAction))
+                shortcuts.Add(("Double Command", ccDoubleAction));
+
+            const float lineHeight = 20f;
+            const float chordWidth = 145f;
             foreach ((string chord, string action) in shortcuts)
             {
                 g.DrawString(chord, shortcutFont, keyBrush,
@@ -192,15 +205,16 @@ namespace GHelper.Overlay
             }
         }
 
-        private static string RogDoubleClickActionName()
+        private static string ShortcutActionName(string configKey)
         {
-            string action = AppConfig.GetString("m4_double");
+            string action = AppConfig.GetString(configKey) ?? "";
             return action switch
             {
                 "" => "",
                 "fan_zero_toggle" => "Toggle 0 RPM fans",
                 "fan_full_toggle" => "Toggle 100% fans",
                 "fan_extreme_switch" => "Switch 0 / 100% fans",
+                "ally_frequency_toggle" => "Automatic / Manual clocks",
                 "ghelper" => "Open G-Helper",
                 "controller" => "Controller mode",
                 "overlay" => "Overlay",
@@ -210,7 +224,7 @@ namespace GHelper.Overlay
                 "brightness_down" => "Brightness down",
                 "volume_up" => "Volume up",
                 "volume_down" => "Volume down",
-                "custom" => AppConfig.GetString("custom_m4_double", "Custom shortcut"),
+                "custom" => AppConfig.GetString("custom_" + configKey, "Custom shortcut"),
                 _ => action.Replace('_', ' ')
             };
         }

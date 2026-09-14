@@ -82,6 +82,7 @@ namespace GHelper.Mode
         {
             SetCPUTemp(AppConfig.GetMode("cpu_temp"));
             SetRyzenPower();
+            ApplyAllyFrequencyLimits();
         }
 
         public void WaitForApply()
@@ -200,7 +201,134 @@ namespace GHelper.Mode
             if (AppConfig.GetMode("auto_boost") != -1)
                     PowerNative.SetCPUBoost(AppConfig.GetMode("auto_boost"));
 
+            ApplyAllyFrequencyLimits();
+
             settings.FansInit();
+        }
+
+        public static bool IsAllyZ1Extreme()
+            => AppConfig.IsAlly() && CpuInfo.Name.Contains("Z1 Extreme", StringComparison.OrdinalIgnoreCase);
+
+        public string ApplyAllyFrequencyLimits(bool launchAsAdmin = false)
+        {
+            if (!IsAllyZ1Extreme()) return string.Empty;
+
+            int cpuMhz = AppConfig.GetMode("ally_cpu_frequency", 0);
+            int gpuMhz = AppConfig.GetMode("ally_gpu_frequency", 0);
+            var result = new System.Text.StringBuilder();
+            bool isAdministrator = ProcessHelper.IsUserAdministrator();
+            bool elevationRequested = false;
+
+            if (cpuMhz == 0 || cpuMhz is >= 1400 and <= 5100)
+            {
+                bool applied = PowerNative.SetMaximumProcessorFrequency(cpuMhz);
+                if (!applied && launchAsAdmin && !isAdministrator)
+                {
+                    ProcessHelper.RunAsAdmin("clocks");
+                    elevationRequested = true;
+                }
+                string status = applied ? "OK" : elevationRequested ? "Applying as administrator" : "Failed";
+                result.AppendLine($"CPU max: {(cpuMhz == 0 ? "Automatic" : cpuMhz + " MHz")} ({status})");
+            }
+
+            if (gpuMhz != 0 && gpuMhz is not (>= 400 and <= 2700))
+                return result.ToString().TrimEnd();
+
+            if (!isAdministrator)
+            {
+                if (launchAsAdmin && !elevationRequested) ProcessHelper.RunAsAdmin("clocks");
+                return result.ToString().TrimEnd();
+            }
+
+            var smu = GetSmu();
+            if (smu?.CanSetGfxClock() == true)
+            {
+                SmuStatus status = smu.SetGfxClock(gpuMhz);
+                Logger.WriteLine($"Ally iGPU frequency: {(gpuMhz == 0 ? "Automatic" : gpuMhz + " MHz")} {status}");
+                result.AppendLine($"GPU: {(gpuMhz == 0 ? "Automatic" : gpuMhz + " MHz")} ({status})");
+            }
+
+            return result.ToString().TrimEnd();
+        }
+
+        public (int MHz, bool Applied, bool ElevationRequested) AdjustAllyCpuFrequency(int direction,
+            bool launchAsAdmin = false)
+        {
+            int current = AppConfig.GetMode("ally_cpu_frequency", 0);
+            if (current < 1400 || current > 5100) current = 5100;
+            int next = Math.Clamp(current + Math.Sign(direction) * 100, 1400, 5100);
+            AppConfig.SetMode("ally_cpu_frequency", next);
+            AppConfig.SetMode("ally_cpu_frequency_manual", next);
+
+            // Apply Ally clock changes from the same elevated helper used by the iGPU.
+            // Windows may accept a non-elevated plan write while the active AMD power
+            // policy continues to ignore it, which previously produced a false success.
+            if (launchAsAdmin && !ProcessHelper.IsUserAdministrator())
+            {
+                ProcessHelper.RunAsAdmin("clocks");
+                return (next, false, true);
+            }
+
+            bool applied = PowerNative.SetMaximumProcessorFrequency(next);
+            return (next, applied, false);
+        }
+
+        public int AdjustAllyGpuFrequency(int direction, bool launchAsAdmin = false)
+        {
+            int current = AppConfig.GetMode("ally_gpu_frequency", 0);
+            if (current < 400 || current > 2700) current = 2700;
+            int next = Math.Clamp(current + Math.Sign(direction) * 100, 400, 2700);
+            AppConfig.SetMode("ally_gpu_frequency", next);
+            AppConfig.SetMode("ally_gpu_frequency_manual", next);
+
+            if (ProcessHelper.IsUserAdministrator())
+            {
+                var smu = GetSmu();
+                if (smu?.CanSetGfxClock() == true)
+                {
+                    SmuStatus status = smu.SetGfxClock(next);
+                    Logger.WriteLine($"Ally iGPU frequency step: {next} MHz {status}");
+                }
+            }
+            else if (launchAsAdmin)
+            {
+                ProcessHelper.RunAsAdmin("clocks");
+            }
+
+            return next;
+        }
+
+        public void ToggleAllyFrequencyMode(bool launchAsAdmin = true)
+        {
+            if (!IsAllyZ1Extreme()) return;
+
+            int cpuMhz = AppConfig.GetMode("ally_cpu_frequency", 0);
+            int gpuMhz = AppConfig.GetMode("ally_gpu_frequency", 0);
+            bool enableManual = cpuMhz == 0 && gpuMhz == 0;
+
+            if (enableManual)
+            {
+                int manualCpu = AppConfig.GetMode("ally_cpu_frequency_manual", 3300);
+                int manualGpu = AppConfig.GetMode("ally_gpu_frequency_manual", 1800);
+                manualCpu = Math.Clamp(manualCpu, 1400, 5100);
+                manualGpu = Math.Clamp(manualGpu, 400, 2700);
+                AppConfig.SetMode("ally_cpu_frequency", manualCpu);
+                AppConfig.SetMode("ally_gpu_frequency", manualGpu);
+                Program.toast.RunToast($"Manual clocks: CPU {manualCpu} / GPU {manualGpu} MHz",
+                    ToastIcon.Controller);
+            }
+            else
+            {
+                if (cpuMhz is >= 1400 and <= 5100)
+                    AppConfig.SetMode("ally_cpu_frequency_manual", cpuMhz);
+                if (gpuMhz is >= 400 and <= 2700)
+                    AppConfig.SetMode("ally_gpu_frequency_manual", gpuMhz);
+                AppConfig.SetMode("ally_cpu_frequency", 0);
+                AppConfig.SetMode("ally_gpu_frequency", 0);
+                Program.toast.RunToast("CPU / GPU clocks: Automatic", ToastIcon.Controller);
+            }
+
+            ApplyAllyFrequencyLimits(launchAsAdmin);
         }
 
 

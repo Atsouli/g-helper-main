@@ -213,6 +213,7 @@ namespace GHelper.Input
                 hook.RegisterHotKey(keyModifierAlt, Keys.F4);
                 hook.RegisterHotKey(keyModifierAlt, Keys.F6);
                 hook.RegisterHotKey(keyModifierAlt, Keys.F9);
+                hook.RegisterHotKey(ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt, Keys.F10);
             }
 
             // FN-Lock group
@@ -347,6 +348,18 @@ namespace GHelper.Input
 
             Logger.WriteLine(e.Key.ToString() + " " + e.Modifier.ToString());
 
+            if (AppConfig.IsAlly() && e.Key == Keys.F10 &&
+                e.Modifier == (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt))
+            {
+                // Let the firmware release the carrier modifiers before emitting Win+D.
+                Task.Run(async () =>
+                {
+                    await Task.Delay(120);
+                    KeyboardHook.KeyKeyPress(Keys.LWin, Keys.D);
+                });
+                return;
+            }
+
             if (e.Modifier == (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt)
                 && e.Key >= Keys.F1 && e.Key < Keys.F1 + AsusKeyboard.LaunchSlots)
             {
@@ -362,12 +375,14 @@ namespace GHelper.Input
             {
                 if (AppConfig.IsAlly() && e.Key == Keys.F17)
                 {
-                    Program.controllerMappingPreview?.ShowPreview();
+                    isRogLongPressed = true;
+                    Program.settingsForm.BeginInvoke(Program.ShowControllerMappingPreview);
                     return;
                 }
                 if (AppConfig.IsAlly() && e.Key == Keys.F18)
                 {
-                    Program.controllerMappingPreview?.HidePreview();
+                    isRogLongPressed = false;
+                    Program.settingsForm.BeginInvoke(Program.HideControllerMappingPreview);
                     return;
                 }
 
@@ -614,6 +629,7 @@ namespace GHelper.Input
 
 
         public static bool isPaddlePressed = false;
+        public static bool isRogLongPressed = false;
 
         public static void KeyProcess(string name = "m3")
         {
@@ -657,6 +673,8 @@ namespace GHelper.Input
                     action = "visual";
                 if (name == "fne")
                     action = "calculator";
+                if (name == "cc_double" && ModeControl.IsAllyZ1Extreme())
+                    action = "ally_frequency_toggle";
             }
 
             ExecuteAction(action, name);
@@ -664,7 +682,16 @@ namespace GHelper.Input
 
         private static void HandleCcClick()
         {
-            if (string.IsNullOrWhiteSpace(AppConfig.GetString("cc_double")))
+            // A paddle-modified Command Center press is a chord, not the first
+            // half of a double click. Execute it immediately while M1/M2 is held.
+            if (isPaddlePressed)
+            {
+                KeyProcess("cc");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(AppConfig.GetString("cc_double")) &&
+                !ModeControl.IsAllyZ1Extreme())
             {
                 KeyProcess("cc");
                 return;
@@ -703,6 +730,13 @@ namespace GHelper.Input
 
         private static void HandleRogClick()
         {
+            // Keep paddle chords responsive even when a ROG double-click action exists.
+            if (isPaddlePressed)
+            {
+                KeyProcess("m4");
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(AppConfig.GetString("m4_double")))
             {
                 KeyProcess("m4");
@@ -842,6 +876,9 @@ namespace GHelper.Input
                     return true;
                 case "fan_extreme_switch":
                     modeControl.SwitchFanExtremeMode();
+                    return true;
+                case "ally_frequency_toggle":
+                    modeControl.ToggleAllyFrequencyMode();
                     return true;
                 case "screenpad_up":
                     SetScreenpad(10);
@@ -1058,10 +1095,12 @@ namespace GHelper.Input
                     // ROG long-press and long-press-release events.
                     case 167:
                         CancelPendingRogClick();
-                        Program.settingsForm.BeginInvoke(() => Program.controllerMappingPreview?.ShowPreview());
+                        isRogLongPressed = true;
+                        Program.settingsForm.BeginInvoke(Program.ShowControllerMappingPreview);
                         return;
                     case 168:
-                        Program.settingsForm.BeginInvoke(() => Program.controllerMappingPreview?.HidePreview());
+                        isRogLongPressed = false;
+                        Program.settingsForm.BeginInvoke(Program.HideControllerMappingPreview);
                         return;
                     // The M4/ROG key.
                     case 56:

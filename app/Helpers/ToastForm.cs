@@ -124,6 +124,9 @@ namespace GHelper.Helpers
 
         public void RunToast(string text, ToastIcon? icon = null)
         {
+            // Mirror every G-Helper toast into RTSS while its in-game OSD is active.
+            // Keep this before disable_osd so users can use RTSS as their only OSD.
+            Program.rtssOverlay?.ShowNotification(text);
 
             if (AppConfig.Is("disable_osd")) return;
 

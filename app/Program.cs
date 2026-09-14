@@ -84,14 +84,12 @@ namespace GHelper
 
             settingsForm = new SettingsForm();
             modeControl = new ModeControl();
-            gpuControl = new GPUModeControl(settingsForm);
-            allyControl = new AllyControl(settingsForm);
+            // SettingsForm already owns these controllers. Reuse them instead of
+            // allocating duplicate wrappers and duplicate event/timer state.
+            gpuControl = settingsForm.gpuControl;
+            allyControl = settingsForm.allyControl;
             clamshellControl = new ClamshellModeControl();
             toast = new ToastForm();
-
-            hardwareOverlay = new HardwareOverlay();
-            rtssOverlay = new RtssOverlay();
-            controllerMappingPreview = new ControllerMappingPreview();
 
             ProcessHelper.CheckAlreadyRunning();
             ProcessHelper.SetPriority();
@@ -204,6 +202,11 @@ namespace GHelper
                     settingsForm.FansToggle(2);
                     modeControl.SetRyzen();
                     break;
+                case "clocks":
+                    Startup.ReScheduleAdmin();
+                    settingsForm.FansToggle(2);
+                    modeControl.ApplyAllyFrequencyLimits();
+                    break;
                 case "colors":
                     Task.Run(async () =>
                     {
@@ -227,10 +230,12 @@ namespace GHelper
             if (AppConfig.Is("rtss_overlay"))
             {
                 AppConfig.Set("overlay", 0);
+                rtssOverlay = new RtssOverlay();
                 if (rtssOverlay?.Start() != true) AppConfig.Set("rtss_overlay", 0);
             }
             else if (AppConfig.IsOverlay())
             {
+                hardwareOverlay = new HardwareOverlay();
                 hardwareOverlay?.StartOverlay();
             }
 
@@ -453,23 +458,25 @@ namespace GHelper
                 if (screen is null) screen = Screen.FromControl(settingsForm);
 
                 settingsForm.WindowState = FormWindowState.Normal;
-
-                settingsForm.Location = screen.WorkingArea.Location;
-                settingsForm.Left = screen.WorkingArea.Width - 10 - settingsForm.Width;
-                settingsForm.Top = screen.WorkingArea.Height - 10 - settingsForm.Height;
+                settingsForm.FitToWorkingAreaHeight(screen);
 
                 settingsForm.Show();
                 settingsForm.ShowAll();
-
-                settingsForm.Left = screen.WorkingArea.Width - 10 - settingsForm.Width;
-
-                if (AppConfig.IsAlly())
-                    settingsForm.Top = Math.Max(10, screen.Bounds.Height - 110 - settingsForm.Height);
-                else
-                    settingsForm.Top = screen.WorkingArea.Height - 10 - settingsForm.Height;
+                settingsForm.FitToWorkingAreaHeight(screen);
 
                 settingsForm.VisualiseGPUMode();
             }
+        }
+
+        public static void ShowControllerMappingPreview()
+        {
+            controllerMappingPreview ??= new ControllerMappingPreview();
+            controllerMappingPreview.ShowPreview();
+        }
+
+        public static void HideControllerMappingPreview()
+        {
+            controllerMappingPreview?.HidePreview();
         }
 
         static void TrayIcon_MouseClick(object? sender, MouseEventArgs e)

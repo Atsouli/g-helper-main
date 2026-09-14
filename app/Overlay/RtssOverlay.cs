@@ -35,12 +35,48 @@ namespace GHelper.Overlay
         private readonly Queue<double> fpsHistory = new();
         private uint fpsHistoryProcessId;
         private bool connectionLogged;
+        private readonly object notificationLock = new();
+        private readonly Queue<string> notificationQueue = new();
+        private string currentNotification = string.Empty;
+        private long notificationExpiresAt;
+        private const int NotificationDurationMs = 2500;
+        private const int MaximumQueuedNotifications = 8;
 
         public bool Active => active;
 
         public RtssOverlay()
         {
             timer.Elapsed += (_, _) => UpdateAndSchedule();
+        }
+
+        public void ShowNotification(string text)
+        {
+            if (!active || !AppConfig.IsNotFalse("rtss_show_notifications") ||
+                string.IsNullOrWhiteSpace(text)) return;
+
+            string notification = text.Replace('\r', ' ').Replace('\n', ' ')
+                .Replace('<', '[').Replace('>', ']');
+            bool refreshNow = false;
+            lock (notificationLock)
+            {
+                long now = Environment.TickCount64;
+                if (currentNotification.Length == 0 || now >= notificationExpiresAt)
+                {
+                    currentNotification = notification;
+                    notificationExpiresAt = now + NotificationDurationMs;
+                    refreshNow = true;
+                }
+                else if (!string.Equals(currentNotification, notification, StringComparison.Ordinal) &&
+                         !notificationQueue.Contains(notification))
+                {
+                    while (notificationQueue.Count >= MaximumQueuedNotifications)
+                        notificationQueue.Dequeue();
+                    notificationQueue.Enqueue(notification);
+                }
+            }
+
+            if (refreshNow)
+                ThreadPool.QueueUserWorkItem(_ => UpdateAndSchedule());
         }
 
         public bool Start()
@@ -81,6 +117,12 @@ namespace GHelper.Overlay
         {
             active = false;
             timer.Stop();
+            lock (notificationLock)
+            {
+                notificationQueue.Clear();
+                currentNotification = string.Empty;
+                notificationExpiresAt = 0;
+            }
             lock (updateLock)
             {
                 ReleaseSlot();
@@ -286,20 +328,26 @@ namespace GHelper.Overlay
             (uint frameTime, string api, uint processId) = ReadForegroundFrameStats(version);
             int fps = frameTime > 0 ? (int)Math.Round(1_000_000d / frameTime) : 0;
             UpdateFpsHistory(processId, fps);
+
+            // Keep the renderer, FPS graph and frame time visually connected.
+            // The remaining sensor groups still use the configured line separator.
+            List<string> fpsGroup = [];
             if (AppConfig.IsNotFalse("rtss_show_fps") && fps > 0)
-                lines.Add(Colorize(tags, 2, $"{api} {fps}"));
+                fpsGroup.Add(Colorize(tags, 2, $"{api} {fps}"));
             if (AppConfig.IsNotFalse("rtss_show_fps_graph") && fps > 0 && version >= EmbeddedObjectsVersion)
-                lines.Add(Colorize(tags, 2, FpsGraphTag));
+                fpsGroup.Add(Colorize(tags, 2, FpsGraphTag));
+            if (AppConfig.IsNotFalse("rtss_show_frametime") && frameTime > 0)
+                fpsGroup.Add(Colorize(tags, 6,
+                    (frameTime / 1000d).ToString("F1", CultureInfo.InvariantCulture) + "ms"));
+            if (fpsGroup.Count > 0)
+                lines.Add(string.Join("  ", fpsGroup));
             if (AppConfig.IsNotFalse("rtss_show_fps_low") && fpsHistory.Count > 0)
                 lines.Add(Colorize(tags, 2, $"1% LOW {CalculateOnePercentLow()}"));
-            if (AppConfig.IsNotFalse("rtss_show_frametime") && frameTime > 0)
-                lines.Add(Colorize(tags, 6, "FT " +
-                    (frameTime / 1000d).ToString("F1", CultureInfo.InvariantCulture) + "ms"));
 
             string? cpu = FormatMetric("CPU", HardwareControl.cpuTemp, HardwareControl.cpuUsage,
-                HardwareControl.cpuPower, HardwareControl.cpuClockMHz, tags, 0, "cpu");
+                HardwareControl.cpuPower, HardwareControl.cpuClockMHz, tags, 0, 7, "cpu");
             string? gpu = FormatMetric("GPU", HardwareControl.gpuTemp, HardwareControl.gpuUsage,
-                HardwareControl.gpuPower, HardwareControl.gpuClockMHz, tags, 1, "gpu");
+                HardwareControl.gpuPower, HardwareControl.gpuClockMHz, tags, 1, 8, "gpu");
             if (cpu != null) lines.Add(cpu);
             if (gpu != null && ((HardwareControl.gpuTemp ?? 0) > 0 || HardwareControl.gpuUsage.HasValue)) lines.Add(gpu);
             decimal battery = HardwareControl.batteryCapacity;
@@ -339,8 +387,12 @@ namespace GHelper.Overlay
                 if (fans.Count > 0) lines.Add(Colorize(tags, 4, "FAN " + string.Join("  ", fans)));
             }
 
+            string notification = GetActiveNotification();
+            if (notification.Length > 0)
+                lines.Insert(0, Colorize(tags, 9, "NOTICE  " + notification));
+
             string formatHeader = tags
-                ? "<C0=45C4FF><C1=FF6B6B><C2=FFE066><C3=74E39A><C4=C58CFF><C5=FF9F43><C6=FFFFFF>\r"
+                ? "<C0=45C4FF><C1=FF6B6B><C2=FFE066><C3=74E39A><C4=C58CFF><C5=FF9F43><C6=FFFFFF><C7=FFB347><C8=DA70D6><C9=5DE2FF>\r"
                 : "";
             if (AppConfig.IsNotFalse("rtss_single_line"))
                 return formatHeader + string.Join("  |  ", lines);
@@ -349,8 +401,29 @@ namespace GHelper.Overlay
             return formatHeader + string.Join("\n", lines);
         }
 
+        private string GetActiveNotification()
+        {
+            lock (notificationLock)
+            {
+                long now = Environment.TickCount64;
+                if (currentNotification.Length > 0 && now < notificationExpiresAt)
+                    return currentNotification;
+
+                if (notificationQueue.Count > 0)
+                {
+                    currentNotification = notificationQueue.Dequeue();
+                    notificationExpiresAt = now + NotificationDurationMs;
+                    return currentNotification;
+                }
+
+                currentNotification = string.Empty;
+                notificationExpiresAt = 0;
+                return string.Empty;
+            }
+        }
+
         private static string? FormatMetric(string name, float? temp, int? usage, float? power,
-            int? clockMHz, bool tags, int color, string configPrefix)
+            int? clockMHz, bool tags, int color, int powerColor, string configPrefix)
         {
             bool showTemp = AppConfig.IsNotFalse($"rtss_show_{configPrefix}_temp");
             bool showUsage = AppConfig.IsNotFalse($"rtss_show_{configPrefix}_usage");
@@ -361,7 +434,11 @@ namespace GHelper.Overlay
             string result = name;
             if (showUsage && usage.HasValue) result += $"  {usage}%";
             if (showTemp) result += temp > 0 ? $" {temp:F0}C" : " --C";
-            if (showPower && power.HasValue) result += $"  {power:F1}W";
+            if (showPower && power.HasValue)
+            {
+                string watts = $"{power:F1}W";
+                result += tags ? $"  <C{powerColor}>{watts}<C{color}>" : "  " + watts;
+            }
             if (showClock && clockMHz > 0) result += $"  {clockMHz}MHz";
             return Colorize(tags, color, result);
         }

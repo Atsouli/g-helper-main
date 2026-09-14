@@ -125,9 +125,30 @@ namespace GHelper.Ally
         public const string BindPause = "02-91";         // Pause/Break key
         public const string BindWinP = "04-02-82-4D";   // Win+P  (display/project mode)
         public const string BindWinH = "04-02-82-33";   // Win+H  (dictation)
+        public const string BindFileExplorer = "04-02-82-24";       // Win+E
+        public const string BindWindowsSettings = "04-02-82-43";    // Win+I
+        public const string BindRunDialog = "04-02-82-2D";          // Win+R
+        public const string BindWindowsSearch = "04-02-82-1B";      // Win+S
+        public const string BindQuickSettings = "04-02-82-1C";      // Win+A
+        public const string BindClipboardHistory = "04-02-82-2A";   // Win+V
+        public const string BindLockPc = "04-02-82-4B";             // Win+L
+        public const string BindEmojiPanel = "04-02-82-49";         // Win+.
+
+        public const string BindCopy = "04-02-8C-21";       // Ctrl+C
+        public const string BindPaste = "04-02-8C-2A";      // Ctrl+V
+        public const string BindCut = "04-02-8C-22";        // Ctrl+X
+        public const string BindUndo = "04-02-8C-1A";       // Ctrl+Z
+        public const string BindRedo = "04-02-8C-35";       // Ctrl+Y
+        public const string BindSelectAll = "04-02-8C-1C";  // Ctrl+A
+        public const string BindSave = "04-02-8C-1B";       // Ctrl+S
+        public const string BindFind = "04-02-8C-2B";       // Ctrl+F
+        public const string BindPerformanceMode = "04-04-8C-88-8A-03"; // Ctrl+Shift+Alt+F5
 
         public const string BindScreenshot = "04-03-82-88-1B";
-        public const string BindShowDesktop = "04-02-82-23";
+        // Use an app-handled reserved chord instead of a direct firmware Win+D macro.
+        // Some Ally firmware revisions translate the direct macro as Win+E.
+        public const string BindShowDesktop = "04-04-8C-88-8A-09"; // Ctrl+Shift+Alt+F10 -> Win+D
+        private const string LegacyBindShowDesktop = "04-02-82-23";
 
         public const string BindShowKeyboard = "05-19";
 
@@ -180,7 +201,7 @@ namespace GHelper.Ally
                 (BindBrightnessUp,      "Bright Up"),
                 (BindBrightnessDown,    "Bright Down"),
                 (BindShowKeyboard,      "Show Keyboard"),
-                (BindShowDesktop,       "Show Desktop"),
+                (BindShowDesktop,       "Show Desktop (Win + D)"),
                 (BindScreenshot,        "Screenshot"),
                 (BindOverlay,           "Overlay"),
                 (BindAmdOverlay,        "AMD Overlay"),
@@ -190,9 +211,33 @@ namespace GHelper.Ally
                 (BindAltTab,            "Alt-Tab"),
                 (BindWinTab,            "Win-Tab"),
                 (BindXGM,               "XGM Toggle"),
+                (BindPerformanceMode,   "Cycle Performance Mode"),
                 (BindWinP,              "Project Mode"),
                 ("05-1E",               "Start Recording"),
                 ("05-01",               "Mic off"),
+            }),
+            ("Windows", new (string, string)[]
+            {
+                (BindFileExplorer,      "File Explorer (Win + E)"),
+                (BindWindowsSettings,   "Windows Settings (Win + I)"),
+                (BindRunDialog,         "Run Dialog (Win + R)"),
+                (BindWindowsSearch,     "Windows Search (Win + S)"),
+                (BindQuickSettings,     "Quick Settings (Win + A)"),
+                (BindClipboardHistory,  "Clipboard History (Win + V)"),
+                (BindEmojiPanel,        "Emoji Panel (Win + .)"),
+                (BindWinH,              "Voice Typing (Win + H)"),
+                (BindLockPc,            "Lock PC (Win + L)"),
+            }),
+            ("Editing", new (string, string)[]
+            {
+                (BindCopy,      "Copy (Ctrl + C)"),
+                (BindPaste,     "Paste (Ctrl + V)"),
+                (BindCut,       "Cut (Ctrl + X)"),
+                (BindUndo,      "Undo (Ctrl + Z)"),
+                (BindRedo,      "Redo (Ctrl + Y)"),
+                (BindSelectAll, "Select All (Ctrl + A)"),
+                (BindSave,      "Save (Ctrl + S)"),
+                (BindFind,      "Find (Ctrl + F)"),
             }),
             ("Modifiers", new (string, string)[]
             {
@@ -316,12 +361,51 @@ namespace GHelper.Ally
         {
             if (!AppConfig.IsAlly()) return;
             settings = settingsForm;
+            MigrateLegacyBindings();
 
             if (timer is null)
             {
                 timer = new System.Timers.Timer(300);
                 timer.Elapsed += Timer_Elapsed;
                 Logger.WriteLine("Ally timer");
+            }
+        }
+
+        private static void MigrateLegacyBindings()
+        {
+            string[] bindingPrefixes =
+            [
+                "bind_", "bind2_",
+                "bind_gamepad_", "bind2_gamepad_",
+                "bind_desktop_", "bind2_desktop_"
+            ];
+            string[] zoneKeys = ["a", "b", "x", "y", "du", "dd", "dl", "dr", "lt", "rt", "lb", "rb", "ls", "rs", "vb", "mb", "m1", "m2"];
+
+            foreach (string prefix in bindingPrefixes)
+            {
+                // Older controller UI builds accidentally stored L3 under "ll".
+                string oldL3 = prefix + "ll";
+                string newL3 = prefix + "ls";
+                if (AppConfig.Exists(oldL3) && !AppConfig.Exists(newL3))
+                    AppConfig.Set(newL3, AppConfig.GetString(oldL3));
+                if (AppConfig.Exists(oldL3)) AppConfig.Remove(oldL3);
+
+                foreach (string zone in zoneKeys)
+                {
+                    string key = prefix + zone;
+                    if (AppConfig.GetString(key) == LegacyBindShowDesktop)
+                        AppConfig.Set(key, BindShowDesktop);
+                }
+            }
+
+            string[] turboPrefixes = ["turbo_", "turbo2_", "turbo_gamepad_", "turbo2_gamepad_", "turbo_desktop_", "turbo2_desktop_"];
+            foreach (string prefix in turboPrefixes)
+            {
+                string oldL3 = prefix + "ll";
+                string newL3 = prefix + "ls";
+                if (AppConfig.Exists(oldL3) && !AppConfig.Exists(newL3))
+                    AppConfig.Set(newL3, AppConfig.Get(oldL3));
+                if (AppConfig.Exists(oldL3)) AppConfig.Remove(oldL3);
             }
         }
 

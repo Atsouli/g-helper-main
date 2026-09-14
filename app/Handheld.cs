@@ -1,4 +1,5 @@
 using GHelper.Ally;
+using GHelper.Mode;
 using GHelper.UI;
 
 namespace GHelper
@@ -78,7 +79,7 @@ namespace GHelper
             ButtonBinding("lb", "Left Bumper", buttonLB);
 
             ButtonBinding("rs", "Right Stick", buttonRS);
-            ButtonBinding("ll", "Left Stick", buttonLS);
+            ButtonBinding("ls", "Left Stick", buttonLS);
 
             ButtonBinding("vb", "View", buttonView);
             ButtonBinding("mb", "Menu", buttonMenu);
@@ -420,6 +421,7 @@ namespace GHelper
               {"fan_zero_toggle", "Toggle 0 RPM fans"},
               {"fan_full_toggle", "Toggle 100% fans"},
               {"fan_extreme_switch", "Switch 0 RPM / 100% fans"},
+              {"ally_frequency_toggle", "Toggle Automatic / Manual clocks"},
               {"ghelper", Properties.Strings.OpenGHelper},
               {"overlay", Properties.Strings.Overlay},
               {"custom", Properties.Strings.Custom},
@@ -431,6 +433,10 @@ namespace GHelper
                 case "m4":
                     customActions[""] = Properties.Strings.OpenGHelper;
                     customActions.Remove("ghelper");
+                    break;
+                case "cc_double" when ModeControl.IsAllyZ1Extreme():
+                    customActions[""] = "Toggle Automatic / Manual clocks";
+                    customActions.Remove("ally_frequency_toggle");
                     break;
             }
 

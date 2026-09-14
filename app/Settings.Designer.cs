@@ -2233,9 +2233,6 @@ namespace GHelper
             // settingsTabs
             // 
             settingsTabs.Controls.Add(tabPerformance);
-            settingsTabs.Controls.Add(tabDisplay);
-            settingsTabs.Controls.Add(tabDevices);
-            settingsTabs.Controls.Add(tabShortcuts);
             settingsTabs.Dock = DockStyle.Fill;
             settingsTabs.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             settingsTabs.Location = new Point(11, 11);
@@ -2248,6 +2245,20 @@ namespace GHelper
             // 
             tabPerformance.AutoScroll = true;
             tabPerformance.BackColor = SystemColors.Control;
+            tabPerformance.Controls.Add(panelFooter);
+            tabPerformance.Controls.Add(panelCustomButtons);
+            tabPerformance.Controls.Add(panelVersion);
+            tabPerformance.Controls.Add(panelStartup);
+            tabPerformance.Controls.Add(panelPeripherals);
+            tabPerformance.Controls.Add(panelAlly);
+            tabPerformance.Controls.Add(panelBattery);
+            tabPerformance.Controls.Add(panelController);
+            tabPerformance.Controls.Add(panelMatrix);
+            tabPerformance.Controls.Add(panelRearLight);
+            tabPerformance.Controls.Add(panelKeyboard);
+            tabPerformance.Controls.Add(panelGamma);
+            tabPerformance.Controls.Add(panelScreen);
+            tabPerformance.Controls.Add(panelOrientation);
             tabPerformance.Controls.Add(panelGPU);
             tabPerformance.Controls.Add(panelPerformance);
             tabPerformance.Location = new Point(4, 46);
@@ -2255,18 +2266,12 @@ namespace GHelper
             tabPerformance.Padding = new Padding(0, 8, 0, 8);
             tabPerformance.Size = new Size(819, 1128);
             tabPerformance.TabIndex = 0;
-            tabPerformance.Text = "Performance";
+            tabPerformance.Text = "All Settings";
             // 
             // tabDisplay
             // 
             tabDisplay.AutoScroll = true;
             tabDisplay.BackColor = SystemColors.Control;
-            tabDisplay.Controls.Add(panelMatrix);
-            tabDisplay.Controls.Add(panelRearLight);
-            tabDisplay.Controls.Add(panelKeyboard);
-            tabDisplay.Controls.Add(panelGamma);
-            tabDisplay.Controls.Add(panelScreen);
-            tabDisplay.Controls.Add(panelOrientation);
             tabDisplay.Location = new Point(4, 46);
             tabDisplay.Name = "tabDisplay";
             tabDisplay.Padding = new Padding(0, 8, 0, 8);
@@ -2278,25 +2283,17 @@ namespace GHelper
             // 
             tabDevices.AutoScroll = true;
             tabDevices.BackColor = SystemColors.Control;
-            tabDevices.Controls.Add(panelFooter);
-            tabDevices.Controls.Add(panelVersion);
-            tabDevices.Controls.Add(panelStartup);
-            tabDevices.Controls.Add(panelPeripherals);
-            tabDevices.Controls.Add(panelAlly);
-            tabDevices.Controls.Add(panelBattery);
-            tabDevices.Controls.Add(panelController);
             tabDevices.Location = new Point(4, 46);
             tabDevices.Name = "tabDevices";
             tabDevices.Padding = new Padding(0, 8, 0, 8);
             tabDevices.Size = new Size(819, 1128);
             tabDevices.TabIndex = 2;
-            tabDevices.Text = "Devices & System";
+            tabDevices.Text = "Devices, System & Shortcuts";
             // 
             // tabShortcuts
             // 
             tabShortcuts.AutoScroll = true;
             tabShortcuts.BackColor = SystemColors.Control;
-            tabShortcuts.Controls.Add(panelCustomButtons);
             tabShortcuts.Location = new Point(4, 46);
             tabShortcuts.Name = "tabShortcuts";
             tabShortcuts.Padding = new Padding(0, 8, 0, 8);

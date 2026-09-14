@@ -61,6 +61,7 @@ namespace GHelper.Overlay
                 ("rtss_show_frametime", "Frame time"),
                 ("rtss_show_ram", "RAM usage"),
                 ("rtss_show_fans", "Fan speeds"),
+                ("rtss_show_notifications", "G-Helper toast notifications"),
                 ("rtss_show_battery", "Battery percentage"),
                 ("rtss_show_battery_time", "Battery time remaining"),
                 ("rtss_show_battery_rate", "Battery charge / drain power")

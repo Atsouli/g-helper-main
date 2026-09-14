@@ -19,11 +19,13 @@ namespace GHelper.UI
         private const ushort ButtonB = 0x2000;
         private const ushort DirectionButtons = DPadUp | DPadDown | DPadLeft | DPadRight;
         private const byte TriggerThreshold = 180;
+        private const int LongPressMs = 650;
 
         private readonly System.Windows.Forms.Timer timer = new() { Interval = 60 };
         private readonly Func<bool> isActive;
         private readonly Action<Keys> navigate;
         private readonly Action activate;
+        private readonly Func<bool> longActivate;
         private readonly Action back;
         private readonly Action<int> changeTab;
         private ushort previousButtons;
@@ -31,6 +33,9 @@ namespace GHelper.UI
         private bool suppressDirectionsUntilRelease;
         private long nextRepeatAt;
         private int controllerIndex = -1;
+        private long buttonADownAt;
+        private bool buttonALongPressChecked;
+        private bool buttonALongActivated;
 
         public bool Enabled
         {
@@ -45,17 +50,21 @@ namespace GHelper.UI
                     previousButtons = 0;
                     repeatingDirection = 0;
                     suppressDirectionsUntilRelease = false;
+                    buttonADownAt = 0;
+                    buttonALongPressChecked = false;
+                    buttonALongActivated = false;
                 }
             }
         }
 
         public GamepadNavigation(IContainer? container, Func<bool> isActive, Action<Keys> navigate,
-            Action activate, Action back, Action<int> changeTab)
+            Action activate, Func<bool> longActivate, Action back, Action<int> changeTab)
         {
             container?.Add(this);
             this.isActive = isActive;
             this.navigate = navigate;
             this.activate = activate;
+            this.longActivate = longActivate;
             this.back = back;
             this.changeTab = changeTab;
             timer.Tick += Timer_Tick;
@@ -71,13 +80,36 @@ namespace GHelper.UI
                 previousButtons = 0;
                 repeatingDirection = 0;
                 suppressDirectionsUntilRelease = false;
+                buttonADownAt = 0;
+                buttonALongPressChecked = false;
+                buttonALongActivated = false;
                 return;
             }
 
             ushort buttons = gamepad.Buttons;
 
             ushort pressed = (ushort)(buttons & ~previousButtons);
-            if ((pressed & ButtonA) != 0) activate();
+            long now = Environment.TickCount64;
+            bool aHeld = (buttons & ButtonA) != 0;
+            bool aWasHeld = (previousButtons & ButtonA) != 0;
+            if (aHeld && !aWasHeld)
+            {
+                buttonADownAt = now;
+                buttonALongPressChecked = false;
+                buttonALongActivated = false;
+            }
+            else if (aHeld && !buttonALongPressChecked && now - buttonADownAt >= LongPressMs)
+            {
+                buttonALongPressChecked = true;
+                buttonALongActivated = longActivate();
+            }
+            else if (!aHeld && aWasHeld)
+            {
+                if (!buttonALongActivated) activate();
+                buttonADownAt = 0;
+                buttonALongPressChecked = false;
+                buttonALongActivated = false;
+            }
             if ((pressed & ButtonB) != 0) back();
             if ((pressed & LeftShoulder) != 0) changeTab(-1);
             if ((pressed & RightShoulder) != 0) changeTab(1);
@@ -89,7 +121,6 @@ namespace GHelper.UI
             ushort direction = tdpChord || suppressDirectionsUntilRelease
                 ? (ushort)0
                 : FirstDirection(heldDirections);
-            long now = Environment.TickCount64;
             if (direction != 0 && (direction != repeatingDirection || now >= nextRepeatAt))
             {
                 navigate(DirectionToKey(direction));

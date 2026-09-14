@@ -4,8 +4,12 @@ namespace GHelper.UI
 {
     public sealed class RShortcutTile : RButton
     {
+        private bool deletePressed;
+
         public string Title { get; set; } = string.Empty;
         public string Shortcut { get; set; } = string.Empty;
+        public event EventHandler? EditRequested;
+        public event EventHandler? DeleteRequested;
 
         public RShortcutTile()
         {
@@ -14,6 +18,50 @@ namespace GHelper.UI
             Activated = true;
             Text = string.Empty;
             Padding = new Padding(12);
+            AccessibleDescription = "Press to run. Hold A or right-click to edit. Select the X to delete.";
+        }
+
+        public void RequestEdit() => EditRequested?.Invoke(this, EventArgs.Empty);
+
+        private Rectangle GetDeleteRectangle()
+        {
+            int scale = Math.Max(1, (int)Math.Round(DeviceDpi / 192f));
+            int size = 18 * scale;
+            return new Rectangle(Width - size - 4 * scale, 4 * scale, size, size);
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && GetDeleteRectangle().Contains(e.Location))
+            {
+                deletePressed = true;
+                Capture = true;
+                Invalidate(GetDeleteRectangle());
+                return;
+            }
+
+            base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            if (deletePressed)
+            {
+                bool delete = e.Button == MouseButtons.Left && GetDeleteRectangle().Contains(e.Location);
+                deletePressed = false;
+                Capture = false;
+                Invalidate(GetDeleteRectangle());
+                if (delete) DeleteRequested?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+
+            if (e.Button == MouseButtons.Right)
+            {
+                RequestEdit();
+                return;
+            }
+
+            base.OnMouseUp(e);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -40,7 +88,7 @@ namespace GHelper.UI
             }
 
             int textX = iconX + iconSize + 12 * scale;
-            int textWidth = Math.Max(1, Width - textX - 12 * scale);
+            int textWidth = Math.Max(1, Width - textX - 36 * scale);
             var titleRect = new Rectangle(textX, 9 * scale, textWidth, 24 * scale);
             var shortcutRect = new Rectangle(textX, 34 * scale, textWidth, 21 * scale);
 
@@ -52,6 +100,21 @@ namespace GHelper.UI
             Color muted = ControlHelper.DarkMode ? Color.FromArgb(185, 205, 215) : Color.FromArgb(85, 95, 110);
             TextRenderer.DrawText(e.Graphics, Shortcut, shortcutFont, shortcutRect, muted,
                 TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
+
+            Rectangle deleteRect = GetDeleteRectangle();
+            Color deleteBack = deletePressed
+                ? Color.FromArgb(90, 255, 75, 85)
+                : Color.FromArgb(ControlHelper.DarkMode ? 48 : 24, 255, 75, 85);
+            using (var deleteBrush = new SolidBrush(deleteBack))
+                e.Graphics.FillEllipse(deleteBrush, deleteRect);
+            using (var deletePen = new Pen(Color.FromArgb(235, 255, 92, 102), Math.Max(1.5f, scale * 1.5f)))
+            {
+                int inset = 5 * scale;
+                e.Graphics.DrawLine(deletePen, deleteRect.Left + inset, deleteRect.Top + inset,
+                    deleteRect.Right - inset, deleteRect.Bottom - inset);
+                e.Graphics.DrawLine(deletePen, deleteRect.Right - inset, deleteRect.Top + inset,
+                    deleteRect.Left + inset, deleteRect.Bottom - inset);
+            }
         }
     }
 }
