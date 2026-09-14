@@ -1,6 +1,6 @@
 using GHelper.Ally;
 using GHelper.AnimeMatrix;
-using GHelper.AutoUpdate;
+
 using GHelper.Battery;
 using GHelper.Display;
 using GHelper.Fan;
@@ -26,11 +26,9 @@ namespace GHelper
     {
         ContextMenuStrip contextMenuStrip = new CustomContextMenu();
         ToolStripMenuItem menuEco, menuStandard, menuUltimate, menuOptimized;
-        DonateControl donateControl;
 
         public GPUModeControl gpuControl;
         public AllyControl allyControl;
-        AutoUpdateControl updateControl;
 
         AsusMouseSettings? mouseSettings;
         AsusKeyboardSettings? keyboardSettings;
@@ -47,13 +45,12 @@ namespace GHelper
         private readonly List<CustomButtonDefinition> customButtons = new();
         private Panel? settingsPerformanceColumn;
 
-        private const string CustomButtonsConfigKey = "custom_buttons";
+        public const string CustomButtonsConfigKey = "custom_buttons";
 
         public Matrix? matrixForm;
         public Slash? slashForm;
         public Fans? fansForm;
         public Extra? extraForm;
-        public Updates? updatesForm;
         public Handheld? handheldForm;
 
         static long lastRefresh;
@@ -92,7 +89,6 @@ namespace GHelper
             }
 
             gpuControl = new GPUModeControl(this);
-            updateControl = new AutoUpdateControl(this);
             matrixControl = new AniMatrixControl(this);
             allyControl = new AllyControl(this);
 
@@ -124,8 +120,6 @@ namespace GHelper
 
             buttonMatrix.Text = "Matrix";
             buttonQuit.Text = Properties.Strings.Quit;
-            buttonUpdates.Text = Properties.Strings.Updates;
-            buttonDonate.Text = Properties.Strings.Donate;
 
             buttonController.Text = Properties.Strings.Controller + " Settings";
             labelAlly.Text = Properties.Strings.AllyController;
@@ -146,7 +140,6 @@ namespace GHelper
             panelMatrix.AccessibleName = Properties.Strings.AnimeMatrix;
             sliderBattery.AccessibleName = Properties.Strings.BatteryChargeLimit;
             buttonQuit.AccessibleName = Properties.Strings.Quit;
-            buttonUpdates.AccessibleName = Properties.Strings.BiosAndDriverUpdates;
             panelPerformance.AccessibleName = Properties.Strings.PerformanceMode;
             buttonSilent.AccessibleName = Properties.Strings.Silent;
             buttonBalanced.AccessibleName = Properties.Strings.Balanced;
@@ -293,7 +286,6 @@ namespace GHelper
             buttonFHD.MouseLeave += ButtonScreen_MouseLeave;
 
             buttonExplorer.Click += ButtonExplorer_Click;
-            buttonUpdates.Click += ButtonUpdates_Click;
 
             sliderBattery.MouseUp += SliderBattery_MouseUp;
             sliderBattery.KeyUp += SliderBattery_KeyUp;
@@ -344,8 +336,6 @@ namespace GHelper
             labelVisual.Click += LabelVisual_Click;
             labelCharge.Click += LabelCharge_Click;
 
-            donateControl = new DonateControl(this, buttonDonate);
-            donateControl.Init();
 
             labelBacklight.ForeColor = colorStandard;
             labelBacklight.Click += LabelBacklight_Click;
@@ -357,7 +347,7 @@ namespace GHelper
             ResumeLayout(false);
         }
 
-        private sealed class CustomButtonDefinition
+        public sealed class CustomButtonDefinition
         {
             public string Name { get; set; } = string.Empty;
             public string Action { get; set; } = string.Empty;
@@ -398,13 +388,13 @@ namespace GHelper
             tableCustomButtons.ColumnStyles.Clear();
             tableCustomButtons.RowStyles.Clear();
             const int columnCount = 2;
-            const int cardRowHeight = 78;
+            const int cardRowHeight = 100;
             tableCustomButtons.ColumnCount = columnCount;
             tableCustomButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableCustomButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             int rowCount = Math.Max(1, (int)Math.Ceiling(customButtons.Count / (double)columnCount));
             tableCustomButtons.RowCount = rowCount;
-            tableCustomButtons.Height = customButtons.Count == 0 ? 82 : rowCount * cardRowHeight;
+
 
             if (customButtons.Count == 0)
             {
@@ -1116,7 +1106,6 @@ namespace GHelper
             {
                 EnsureSettingsTopMost();
                 Task.Run((Action)RefreshPeripheralsBattery);
-                updateControl.CheckForUpdates();
                 BeginInvoke((Action)FocusFirstControl);
             }
         }
@@ -1370,25 +1359,6 @@ namespace GHelper
             }
         }
 
-        private void ButtonUpdates_Click(object? sender, EventArgs e)
-        {
-            if (updatesForm == null || updatesForm.Text == "")
-            {
-                updatesForm = new Updates();
-                AddOwnedForm(updatesForm);
-            }
-
-            if (updatesForm.Visible)
-            {
-                updatesForm.Close();
-            }
-            else
-            {
-                PrepareAuxiliaryWindow(updatesForm);
-                updatesForm.Show();
-                updatesForm.Activate();
-            }
-        }
 
         public void VisualiseMatrixPicture(string image)
         {
@@ -1610,7 +1580,6 @@ namespace GHelper
                 contextMenuStrip.ForeColor = this.ForeColor;
             }
 
-            donateControl?.ApplyTheme();
         }
 
         private void ButtonXGM_Click(object? sender, EventArgs e)
@@ -1637,7 +1606,6 @@ namespace GHelper
 
         private void LabelVersion_Click(object? sender, EventArgs e)
         {
-            updateControl.Update();
         }
 
 
@@ -2249,7 +2217,7 @@ namespace GHelper
             this.Hide();
             if (fansForm != null && fansForm.Text != "") fansForm.Close();
             if (extraForm != null && extraForm.Text != "") extraForm.Close();
-            if (updatesForm != null && updatesForm.Text != "") updatesForm.Close();
+
             if (matrixForm != null && matrixForm.Text != "") matrixForm.Close();
             if (slashForm != null && slashForm.Text != "") slashForm.Close();
             if (handheldForm != null && handheldForm.Text != "") handheldForm.Close();
@@ -2345,7 +2313,7 @@ namespace GHelper
         {
             return (fansForm != null && fansForm.ContainsFocus) ||
                    (extraForm != null && extraForm.ContainsFocus) ||
-                   (updatesForm != null && updatesForm.ContainsFocus) ||
+
                    (matrixForm != null && matrixForm.ContainsFocus) ||
                    (slashForm != null && slashForm.ContainsFocus) ||
                    (handheldForm != null && handheldForm.ContainsFocus) ||
@@ -2850,7 +2818,7 @@ namespace GHelper
 
         public void VisualiseBatteryTitle(int limit)
         {
-            labelBatteryTitle.Text = Properties.Strings.BatteryChargeLimit + ": " + limit.ToString() + "%";
+            labelBatteryTitle.Text = Properties.Strings.BatteryChargeLimit + ":\r\n" + limit.ToString() + "%";
         }
 
         public void VisualiseBattery(int limit)

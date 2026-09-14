@@ -154,7 +154,7 @@ namespace GHelper.Ally
 
         static byte[] CommandReady = new byte[] { AsusHid.INPUT_ID, 0xD1, 0x0A, 0x01 };
 
-        public static IReadOnlyList<(string GroupLabel, IReadOnlyList<(string Code, string Name)> Items)> BindingGroups { get; } =
+        private static IReadOnlyList<(string GroupLabel, IReadOnlyList<(string Code, string Name)> Items)> _defaultBindingGroups =
         [
             ("", new (string, string)[]
             {
@@ -204,6 +204,7 @@ namespace GHelper.Ally
                 (BindShowDesktop,       "Show Desktop (Win + D)"),
                 (BindScreenshot,        "Screenshot"),
                 (BindOverlay,           "Overlay"),
+                ("rtss_overlay",        "RTSS OSD"),
                 (BindAmdOverlay,        "AMD Overlay"),
                 (BindTaskManager,       "Task Manager"),
                 (BindCloseWindow,       "Close Window"),
@@ -356,6 +357,33 @@ namespace GHelper.Ally
                 ("02-7D", "Num9"),
             }),
         ];
+
+        public static IReadOnlyList<(string GroupLabel, IReadOnlyList<(string Code, string Name)> Items)> BindingGroups
+        {
+            get
+            {
+                var list = _defaultBindingGroups.ToList();
+                string? json = AppConfig.GetString(SettingsForm.CustomButtonsConfigKey);
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    try
+                    {
+                        var customButtons = System.Text.Json.JsonSerializer.Deserialize<List<SettingsForm.CustomButtonDefinition>>(json);
+                        if (customButtons != null && customButtons.Count > 0)
+                        {
+                            var customItems = customButtons
+                                .Where(b => !string.IsNullOrWhiteSpace(b.Name) && !string.IsNullOrWhiteSpace(b.Action))
+                                .Select(b => (Code: b.Action, Name: b.Name))
+                                .ToArray();
+                            if (customItems.Length > 0)
+                                list.Add(("Custom Shortcuts", customItems));
+                        }
+                    }
+                    catch { }
+                }
+                return list;
+            }
+        }
 
         public AllyControl(SettingsForm settingsForm)
         {

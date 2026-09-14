@@ -440,6 +440,26 @@ namespace GHelper
                     break;
             }
 
+            customActions.Add("rtss_overlay", "RTSS OSD");
+
+            string? json = AppConfig.GetString(SettingsForm.CustomButtonsConfigKey);
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                try
+                {
+                    var customButtons = System.Text.Json.JsonSerializer.Deserialize<List<SettingsForm.CustomButtonDefinition>>(json);
+                    if (customButtons != null)
+                    {
+                        foreach (var b in customButtons)
+                        {
+                            if (!string.IsNullOrWhiteSpace(b.Name) && !string.IsNullOrWhiteSpace(b.Action) && !customActions.ContainsKey(b.Action))
+                                customActions.Add(b.Action, b.Name);
+                        }
+                    }
+                }
+                catch { }
+            }
+
             combo.DataSource = new BindingSource(customActions, null);
             combo.DisplayMember = "Value";
             combo.ValueMember = "Key";

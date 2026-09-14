@@ -303,9 +303,6 @@ namespace GHelper
                     if (settingsForm.extraForm is not null && settingsForm.extraForm.Text != "")
                         settingsForm.extraForm.InitTheme();
 
-                    if (settingsForm.updatesForm is not null && settingsForm.updatesForm.Text != "")
-                        settingsForm.updatesForm.InitTheme();
-
                     if (settingsForm.matrixForm is not null && settingsForm.matrixForm.Text != "")
                         settingsForm.matrixForm.InitTheme();
 

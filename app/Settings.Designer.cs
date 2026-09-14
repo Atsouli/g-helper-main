@@ -359,7 +359,7 @@ namespace GHelper
             buttonBatteryFull.FlatStyle = FlatStyle.Flat;
             buttonBatteryFull.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonBatteryFull.ForeColor = SystemColors.ControlDark;
-            buttonBatteryFull.Location = new Point(728, 62);
+            buttonBatteryFull.Location = new Point(728, 102);
             buttonBatteryFull.Borderless = true;
             buttonBatteryFull.Margin = new Padding(0);
             buttonBatteryFull.Name = "buttonBatteryFull";
@@ -372,7 +372,7 @@ namespace GHelper
             // sliderBattery
             // 
             sliderBattery.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            sliderBattery.Location = new Point(20, 60);
+            sliderBattery.Location = new Point(20, 100);
             sliderBattery.Margin = new Padding(4);
             sliderBattery.Max = 100;
             sliderBattery.Min = 40;
@@ -393,7 +393,7 @@ namespace GHelper
             panelBatteryTitle.Margin = new Padding(4);
             panelBatteryTitle.Name = "panelBatteryTitle";
             panelBatteryTitle.Padding = new Padding(0, 0, 0, 4);
-            panelBatteryTitle.Size = new Size(787, 44);
+            panelBatteryTitle.Size = new Size(787, 84);
             panelBatteryTitle.TabIndex = 40;
             // 
             // labelBattery
@@ -402,7 +402,7 @@ namespace GHelper
             labelBattery.Location = new Point(455, 0);
             labelBattery.Margin = new Padding(8, 0, 8, 0);
             labelBattery.Name = "labelBattery";
-            labelBattery.Size = new Size(324, 36);
+            labelBattery.Size = new Size(324, 84);
             labelBattery.TabIndex = 39;
             labelBattery.Text = "                ";
             labelBattery.TextAlign = ContentAlignment.TopRight;
@@ -424,7 +424,7 @@ namespace GHelper
             labelBatteryTitle.Location = new Point(43, 0);
             labelBatteryTitle.Margin = new Padding(8, 0, 8, 0);
             labelBatteryTitle.Name = "labelBatteryTitle";
-            labelBatteryTitle.Size = new Size(467, 32);
+            labelBatteryTitle.Size = new Size(400, 84);
             labelBatteryTitle.TabIndex = 37;
             labelBatteryTitle.Text = "Battery Charge Limit";
             // 
@@ -444,15 +444,11 @@ namespace GHelper
             // tableButtons
             // 
             tableButtons.AutoSize = true;
-            tableButtons.ColumnCount = 4;
-            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableButtons.Controls.Add(buttonDonate, 0, 0);
-            tableButtons.Controls.Add(buttonExplorer, 1, 0);
-            tableButtons.Controls.Add(buttonUpdates, 2, 0);
-            tableButtons.Controls.Add(buttonQuit, 3, 0);
+            tableButtons.ColumnCount = 2;
+            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableButtons.Controls.Add(buttonExplorer, 0, 0);
+            tableButtons.Controls.Add(buttonQuit, 1, 0);
             tableButtons.Dock = DockStyle.Top;
             tableButtons.Location = new Point(20, 10);
             tableButtons.Margin = new Padding(8, 4, 8, 4);
@@ -2056,6 +2052,8 @@ namespace GHelper
             // 
             // tableCustomButtons
             // 
+            tableCustomButtons.AutoSize = true;
+            tableCustomButtons.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             tableCustomButtons.AutoScroll = false;
             tableCustomButtons.ColumnCount = 2;
             tableCustomButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
@@ -2065,7 +2063,7 @@ namespace GHelper
             tableCustomButtons.Margin = new Padding(0);
             tableCustomButtons.Name = "tableCustomButtons";
             tableCustomButtons.RowCount = 1;
-            tableCustomButtons.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableCustomButtons.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
             tableCustomButtons.Size = new Size(799, 96);
             tableCustomButtons.TabIndex = 1;
             // 

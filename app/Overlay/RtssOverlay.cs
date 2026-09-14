@@ -382,9 +382,9 @@ namespace GHelper.Overlay
             if (AppConfig.IsNotFalse("rtss_show_fans"))
             {
                 List<string> fans = [];
-                if (HardwareControl.cpuFanRPM > 0) fans.Add($"CPU {HardwareControl.cpuFanRPM} RPM");
-                if (HardwareControl.gpuFanRPM > 0) fans.Add($"GPU {HardwareControl.gpuFanRPM} RPM");
-                if (fans.Count > 0) lines.Add(Colorize(tags, 4, "FAN " + string.Join("  ", fans)));
+                if (HardwareControl.cpuFanRPM > 0) fans.Add(Colorize(tags, 0, $"{HardwareControl.cpuFanRPM}"));
+                if (HardwareControl.gpuFanRPM > 0) fans.Add(Colorize(tags, 1, $"{HardwareControl.gpuFanRPM}"));
+                if (fans.Count > 0) lines.Add(string.Join("  ", fans));
             }
 
             string notification = GetActiveNotification();
@@ -405,16 +405,19 @@ namespace GHelper.Overlay
         {
             lock (notificationLock)
             {
+                if (notificationQueue.Count > 0)
+                {
+                    while (notificationQueue.Count > 1)
+                        notificationQueue.Dequeue();
+                    
+                    currentNotification = notificationQueue.Dequeue();
+                    notificationExpiresAt = Environment.TickCount64 + NotificationDurationMs;
+                    return currentNotification;
+                }
+
                 long now = Environment.TickCount64;
                 if (currentNotification.Length > 0 && now < notificationExpiresAt)
                     return currentNotification;
-
-                if (notificationQueue.Count > 0)
-                {
-                    currentNotification = notificationQueue.Dequeue();
-                    notificationExpiresAt = now + NotificationDurationMs;
-                    return currentNotification;
-                }
 
                 currentNotification = string.Empty;
                 notificationExpiresAt = 0;
