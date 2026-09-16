@@ -92,6 +92,8 @@ namespace GHelper
             this.Controls.Add(btnClose);
             btnClose.BringToFront();
 
+            sliderBattery.Dock = DockStyle.Top;
+
             ConfigureSinglePageLayout();
             KeyPreview = true;
             InitTheme(true);
@@ -108,6 +110,8 @@ namespace GHelper
             }
 
             gpuControl = new GPUModeControl(this);
+
+            SetVersionLabel("v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString());
             matrixControl = new AniMatrixControl(this);
             allyControl = new AllyControl(this);
 

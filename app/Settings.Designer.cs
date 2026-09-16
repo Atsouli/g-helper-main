@@ -222,7 +222,7 @@ namespace GHelper
             panelMatrix.Location = new Point(11, 1071);
             panelMatrix.Margin = new Padding(0);
             panelMatrix.Name = "panelMatrix";
-            panelMatrix.Padding = new Padding(20, 20, 20, 11);
+            panelMatrix.Padding = new Padding(10, 20, 10, 11);
             panelMatrix.Size = new Size(440, 183);
             panelMatrix.TabIndex = 4;
             panelMatrix.TabStop = true;
@@ -292,7 +292,7 @@ namespace GHelper
             buttonMatrix.Location = new Point(527, 4);
             buttonMatrix.Margin = new Padding(4);
             buttonMatrix.MaximumSize = new Size(0, 48);
-            buttonMatrix.MinimumSize = new Size(0, 48);
+            buttonMatrix.MinimumSize = new Size(430, 48);
             buttonMatrix.Name = "buttonMatrix";
             buttonMatrix.Secondary = true;
             buttonMatrix.Size = new Size(253, 48);
@@ -344,7 +344,7 @@ namespace GHelper
             panelBattery.Location = new Point(11, 1683);
             panelBattery.Margin = new Padding(0);
             panelBattery.Name = "panelBattery";
-            panelBattery.Padding = new Padding(20, 15, 20, 0);
+            panelBattery.Padding = new Padding(10, 15, 10, 0);
             panelBattery.Size = new Size(440, 104);
             panelBattery.TabIndex = 8;
             // 
@@ -437,7 +437,7 @@ namespace GHelper
             panelFooter.Location = new Point(11, 1887);
             panelFooter.Margin = new Padding(0);
             panelFooter.Name = "panelFooter";
-            panelFooter.Padding = new Padding(20, 10, 20, 20);
+            panelFooter.Padding = new Padding(10, 10, 10, 20);
             panelFooter.Size = new Size(440, 88);
             panelFooter.TabIndex = 11;
             // 
@@ -740,7 +740,7 @@ namespace GHelper
             panelGPU.Location = new Point(11, 219);
             panelGPU.Margin = new Padding(0);
             panelGPU.Name = "panelGPU";
-            panelGPU.Padding = new Padding(20, 20, 20, 0);
+            panelGPU.Padding = new Padding(10, 20, 10, 0);
             panelGPU.Size = new Size(440, 432);
             panelGPU.TabIndex = 1;
             panelGPU.TabStop = true;
@@ -1061,7 +1061,7 @@ namespace GHelper
             panelScreen.Location = new Point(11, 651);
             panelScreen.Margin = new Padding(0);
             panelScreen.Name = "panelScreen";
-            panelScreen.Padding = new Padding(20, 11, 20, 0);
+            panelScreen.Padding = new Padding(10, 11, 10, 0);
             panelScreen.Size = new Size(440, 187);
             panelScreen.TabIndex = 2;
             panelScreen.TabStop = true;
@@ -1073,7 +1073,7 @@ namespace GHelper
             panelOrientation.Location = new Point(0, 8);
             panelOrientation.Margin = new Padding(0);
             panelOrientation.Name = "panelOrientation";
-            panelOrientation.Padding = new Padding(20, 10, 20, 10);
+            panelOrientation.Padding = new Padding(10, 10, 10, 10);
             panelOrientation.Size = new Size(432, 76);
             panelOrientation.TabIndex = 0;
             // 
@@ -1197,7 +1197,7 @@ namespace GHelper
             buttonOrientation.Location = new Point(20, 10);
             buttonOrientation.Margin = new Padding(0);
             buttonOrientation.MaximumSize = new Size(0, 56);
-            buttonOrientation.MinimumSize = new Size(0, 56);
+            buttonOrientation.MinimumSize = new Size(430, 56);
             buttonOrientation.Name = "buttonOrientation";
             buttonOrientation.Secondary = false;
             buttonOrientation.Size = new Size(392, 56);
@@ -1303,7 +1303,7 @@ namespace GHelper
             panelKeyboard.Location = new Point(11, 1394);
             panelKeyboard.Margin = new Padding(0);
             panelKeyboard.Name = "panelKeyboard";
-            panelKeyboard.Padding = new Padding(20, 20, 20, 0);
+            panelKeyboard.Padding = new Padding(10, 20, 10, 0);
             panelKeyboard.Size = new Size(440, 146);
             panelKeyboard.TabIndex = 6;
             panelKeyboard.TabStop = true;
@@ -1464,7 +1464,7 @@ namespace GHelper
             panelRearLight.Location = new Point(11, 1540);
             panelRearLight.Margin = new Padding(0);
             panelRearLight.Name = "panelRearLight";
-            panelRearLight.Padding = new Padding(20, 20, 20, 0);
+            panelRearLight.Padding = new Padding(10, 20, 10, 0);
             panelRearLight.Size = new Size(440, 112);
             panelRearLight.TabIndex = 7;
             panelRearLight.TabStop = true;
@@ -1503,7 +1503,7 @@ namespace GHelper
             buttonRearColor.Location = new Point(0, 0);
             buttonRearColor.Margin = new Padding(4);
             buttonRearColor.MaximumSize = new Size(0, 48);
-            buttonRearColor.MinimumSize = new Size(0, 44);
+            buttonRearColor.MinimumSize = new Size(430, 44);
             buttonRearColor.Name = "buttonRearColor";
             buttonRearColor.Secondary = false;
             buttonRearColor.Size = new Size(254, 44);
@@ -1568,7 +1568,7 @@ namespace GHelper
             panelStartup.Location = new Point(11, 1787);
             panelStartup.Margin = new Padding(0);
             panelStartup.Name = "panelStartup";
-            panelStartup.Padding = new Padding(20, 0, 20, 0);
+            panelStartup.Padding = new Padding(10, 0, 10, 0);
             panelStartup.Size = new Size(440, 50);
             panelStartup.TabIndex = 9;
             // 
@@ -1593,7 +1593,7 @@ namespace GHelper
             panelPeripherals.Location = new Point(11, 1540);
             panelPeripherals.Margin = new Padding(0);
             panelPeripherals.Name = "panelPeripherals";
-            panelPeripherals.Padding = new Padding(20, 5, 20, 10);
+            panelPeripherals.Padding = new Padding(10, 5, 10, 10);
             panelPeripherals.Size = new Size(440, 143);
             panelPeripherals.TabIndex = 7;
             panelPeripherals.Visible = false;
@@ -1702,7 +1702,7 @@ namespace GHelper
             panelAlly.Location = new Point(11, 1254);
             panelAlly.Margin = new Padding(0);
             panelAlly.Name = "panelAlly";
-            panelAlly.Padding = new Padding(20, 20, 20, 0);
+            panelAlly.Padding = new Padding(10, 20, 10, 0);
             panelAlly.Size = new Size(440, 140);
             panelAlly.TabIndex = 5;
             panelAlly.TabStop = true;
@@ -1733,7 +1733,7 @@ namespace GHelper
             panelController.Location = new Point(0, 8);
             panelController.Margin = new Padding(0);
             panelController.Name = "panelController";
-            panelController.Padding = new Padding(20, 10, 20, 10);
+            panelController.Padding = new Padding(10, 10, 10, 10);
             panelController.Size = new Size(432, 76);
             panelController.TabIndex = 0;
             // 
@@ -1753,7 +1753,7 @@ namespace GHelper
             buttonController.Location = new Point(20, 10);
             buttonController.Margin = new Padding(0);
             buttonController.MaximumSize = new Size(0, 56);
-            buttonController.MinimumSize = new Size(0, 56);
+            buttonController.MinimumSize = new Size(430, 56);
             buttonController.Name = "buttonController";
             buttonController.Secondary = true;
             buttonController.Size = new Size(392, 56);
@@ -1851,7 +1851,7 @@ namespace GHelper
             panelGamma.Location = new Point(11, 838);
             panelGamma.Margin = new Padding(0);
             panelGamma.Name = "panelGamma";
-            panelGamma.Padding = new Padding(20, 11, 20, 11);
+            panelGamma.Padding = new Padding(10, 11, 10, 11);
             panelGamma.Size = new Size(440, 233);
             panelGamma.TabIndex = 3;
             panelGamma.Visible = false;
@@ -2122,9 +2122,9 @@ namespace GHelper
             panelVersion.Controls.Add(labelVersion);
             panelVersion.Dock = DockStyle.Top;
             panelVersion.Location = new Point(11, 1837);
-            panelVersion.MinimumSize = new Size(0, 50);
+            panelVersion.MinimumSize = new Size(430, 50);
             panelVersion.Name = "panelVersion";
-            panelVersion.Padding = new Padding(20, 5, 24, 5);
+            panelVersion.Padding = new Padding(10, 5, 24, 5);
             panelVersion.Size = new Size(440, 50);
             panelVersion.TabIndex = 10;
             // 
@@ -2305,13 +2305,13 @@ namespace GHelper
             // 
             AutoScaleDimensions = new SizeF(192F, 192F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(460, 1200);
+            ClientSize = new Size(430, 1200);
             Controls.Add(settingsTabs);
             Margin = new Padding(8, 4, 8, 4);
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimizeBox = false;
-            MinimumSize = new Size(460, 71);
+            MinimumSize = new Size(430, 71);
             Name = "SettingsForm";
             Padding = new Padding(11);
             ShowIcon = false;
