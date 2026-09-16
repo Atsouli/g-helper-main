@@ -21,7 +21,7 @@ namespace GHelper.UI
             if (Width < 4 || Height < 4) return;
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            var bounds = new Rectangle(0, 3, Width - 1, Height - 7);
+            var bounds = new Rectangle(0, 3, Width, Height - 7);
             using var path = RComboBox.RoundedRect(bounds, CornerRadius, CornerRadius);
 
             Color top = ControlHelper.DarkMode
