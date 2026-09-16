@@ -998,11 +998,11 @@ namespace GHelper
             if (applyingFullHeightLayout || IsDisposed) return;
 
             Rectangle area = (targetScreen ?? Screen.FromControl(this)).WorkingArea;
-            int halfWidth = area.Width / 2;
+            int targetWidth = this.MinimumSize.Width > 0 ? this.MinimumSize.Width : 500;
             Rectangle fullHeightBounds = new(
-                area.Right - halfWidth,
+                area.Right - targetWidth,
                 area.Top,
-                halfWidth,
+                targetWidth,
                 area.Height);
 
             if (Bounds == fullHeightBounds) return;
@@ -1022,7 +1022,7 @@ namespace GHelper
             settingsTabs.HideSingleTabHeader = true;
             tabPerformance.Text = "";
             tabPerformance.AutoScroll = false;
-            tabPerformance.Padding = new Padding(6);
+            tabPerformance.Padding = new Padding(0);
 
             var dashboard = new TableLayoutPanel
             {

@@ -292,7 +292,7 @@ namespace GHelper
             buttonMatrix.Location = new Point(527, 4);
             buttonMatrix.Margin = new Padding(4);
             buttonMatrix.MaximumSize = new Size(0, 48);
-            buttonMatrix.MinimumSize = new Size(430, 48);
+            buttonMatrix.MinimumSize = new Size(0, 48);
             buttonMatrix.Name = "buttonMatrix";
             buttonMatrix.Secondary = true;
             buttonMatrix.Size = new Size(253, 48);
@@ -398,12 +398,11 @@ namespace GHelper
             // 
             // labelBattery
             // 
-            labelBattery.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelBattery.Location = new Point(10, 0);
+            labelBattery.Dock = DockStyle.Right;
+            labelBattery.AutoSize = true;
             labelBattery.Margin = new Padding(8, 0, 8, 0);
             labelBattery.Name = "labelBattery";
-            labelBattery.Size = new Size(390, 84);
-            labelBattery.TabIndex = 39;
+                        labelBattery.TabIndex = 39;
             labelBattery.Text = "                ";
             labelBattery.TextAlign = ContentAlignment.TopRight;
             // 
@@ -717,13 +716,12 @@ namespace GHelper
             // labelCPUFan
             // 
             labelCPUFan.AccessibleRole = AccessibleRole.TitleBar;
-            labelCPUFan.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            labelCPUFan.Dock = DockStyle.Right;
             labelCPUFan.Cursor = Cursors.Hand;
-            labelCPUFan.Location = new Point(10, 0);
+            labelCPUFan.AutoSize = true;
             labelCPUFan.Margin = new Padding(8, 0, 8, 0);
             labelCPUFan.Name = "labelCPUFan";
-            labelCPUFan.Size = new Size(390, 36);
-            labelCPUFan.TabIndex = 33;
+                        labelCPUFan.TabIndex = 33;
             labelCPUFan.Text = "      ";
             labelCPUFan.TextAlign = ContentAlignment.TopRight;
             // 
@@ -1039,12 +1037,11 @@ namespace GHelper
             // 
             // labelGPUFan
             // 
-            labelGPUFan.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelGPUFan.Location = new Point(10, 0);
+            labelGPUFan.Dock = DockStyle.Right;
+            labelGPUFan.AutoSize = true;
             labelGPUFan.Margin = new Padding(8, 0, 8, 0);
             labelGPUFan.Name = "labelGPUFan";
-            labelGPUFan.Size = new Size(390, 35);
-            labelGPUFan.TabIndex = 20;
+                        labelGPUFan.TabIndex = 20;
             labelGPUFan.Text = "         ";
             labelGPUFan.TextAlign = ContentAlignment.TopRight;
             // 
@@ -1197,7 +1194,7 @@ namespace GHelper
             buttonOrientation.Location = new Point(20, 10);
             buttonOrientation.Margin = new Padding(0);
             buttonOrientation.MaximumSize = new Size(0, 56);
-            buttonOrientation.MinimumSize = new Size(430, 56);
+            buttonOrientation.MinimumSize = new Size(0, 56);
             buttonOrientation.Name = "buttonOrientation";
             buttonOrientation.Secondary = false;
             buttonOrientation.Size = new Size(392, 56);
@@ -1260,12 +1257,11 @@ namespace GHelper
             // 
             // labelMidFan
             // 
-            labelMidFan.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelMidFan.Location = new Point(10, 0);
+            labelMidFan.Dock = DockStyle.Right;
+            labelMidFan.AutoSize = true;
             labelMidFan.Margin = new Padding(8, 0, 8, 0);
             labelMidFan.Name = "labelMidFan";
-            labelMidFan.Size = new Size(390, 35);
-            labelMidFan.TabIndex = 28;
+                        labelMidFan.TabIndex = 28;
             labelMidFan.Text = "         ";
             labelMidFan.TextAlign = ContentAlignment.TopRight;
             // 
@@ -1503,7 +1499,7 @@ namespace GHelper
             buttonRearColor.Location = new Point(0, 0);
             buttonRearColor.Margin = new Padding(4);
             buttonRearColor.MaximumSize = new Size(0, 48);
-            buttonRearColor.MinimumSize = new Size(430, 44);
+            buttonRearColor.MinimumSize = new Size(0, 44);
             buttonRearColor.Name = "buttonRearColor";
             buttonRearColor.Secondary = false;
             buttonRearColor.Size = new Size(254, 44);
@@ -1753,7 +1749,7 @@ namespace GHelper
             buttonController.Location = new Point(20, 10);
             buttonController.Margin = new Padding(0);
             buttonController.MaximumSize = new Size(0, 56);
-            buttonController.MinimumSize = new Size(430, 56);
+            buttonController.MinimumSize = new Size(0, 56);
             buttonController.Name = "buttonController";
             buttonController.Secondary = true;
             buttonController.Size = new Size(392, 56);
@@ -2006,12 +2002,11 @@ namespace GHelper
             // 
             // labelGamma
             // 
-            labelGamma.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelGamma.Location = new Point(150, 0);
+            labelGamma.Dock = DockStyle.Right;
+            labelGamma.AutoSize = true;
             labelGamma.Margin = new Padding(4, 0, 4, 0);
             labelGamma.Name = "labelGamma";
-            labelGamma.Size = new Size(250, 32);
-            labelGamma.TabIndex = 39;
+                        labelGamma.TabIndex = 39;
             labelGamma.Text = "                ";
             labelGamma.TextAlign = ContentAlignment.TopRight;
             // 
@@ -2122,7 +2117,7 @@ namespace GHelper
             panelVersion.Controls.Add(labelVersion);
             panelVersion.Dock = DockStyle.Top;
             panelVersion.Location = new Point(11, 1837);
-            panelVersion.MinimumSize = new Size(430, 50);
+            panelVersion.MinimumSize = new Size(0, 50);
             panelVersion.Name = "panelVersion";
             panelVersion.Padding = new Padding(10, 5, 24, 5);
             panelVersion.Size = new Size(440, 50);
@@ -2305,15 +2300,15 @@ namespace GHelper
             // 
             AutoScaleDimensions = new SizeF(192F, 192F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(430, 1200);
+            ClientSize = new Size(1000, 1200);
             Controls.Add(settingsTabs);
             Margin = new Padding(8, 4, 8, 4);
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimizeBox = false;
-            MinimumSize = new Size(430, 71);
+            MinimumSize = new Size(1000, 71);
             Name = "SettingsForm";
-            Padding = new Padding(11);
+            Padding = new Padding(2);
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "G-Helper";
