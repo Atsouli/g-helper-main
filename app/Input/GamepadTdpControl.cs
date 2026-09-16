@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using GHelper.Ally;
 using GHelper.Display;
 using GHelper.Helpers;
 using GHelper.Mode;
@@ -21,6 +22,14 @@ namespace GHelper.Input
         private const ushort DPadDown = 0x0002;
         private const ushort LeftBumper = 0x0100;
         private const ushort RightBumper = 0x0200;
+        private const ushort StartButton = 0x0010;
+        private const ushort BackButton = 0x0020;
+        private const ushort LeftStickButton = 0x0040;
+        private const ushort RightStickButton = 0x0080;
+        private const ushort AButton = 0x1000;
+        private const ushort BButton = 0x2000;
+        private const ushort XButton = 0x4000;
+        private const ushort YButton = 0x8000;
         private const ushort BumperButtons = LeftBumper | RightBumper;
         private const ushort HorizontalDirections = DPadLeft | DPadRight;
         private const ushort AllDirections = DPadUp | DPadDown | DPadLeft | DPadRight;
@@ -78,6 +87,10 @@ namespace GHelper.Input
         private double mouseRemainderY;
         private bool previousPaddleLeftClick;
         private bool previousPaddleRightClick;
+        private ushort previousRogButtons;
+        private bool previousRogLeftTrigger;
+        private bool previousRogRightTrigger;
+        private readonly HashSet<string> previousRogStickDirections = [];
 
         public GamepadTdpControl()
         {
@@ -130,12 +143,13 @@ namespace GHelper.Input
 
             HandleFrequencyChord(gamepad, now);
             HandleBrightnessChord(gamepad, now);
+            HandleRogThirdLayer(gamepad);
             HandlePaddleMouse(gamepad);
         }
 
         private void HandleFrequencyChord(XInputGamepad gamepad, long now)
         {
-            if (!ModeControl.IsAllyZ1Extreme() || !InputDispatcher.isRogLongPressed)
+            if (!InputDispatcher.isRogLongPressed)
             {
                 ResetFrequencyChord();
                 return;
@@ -168,16 +182,28 @@ namespace GHelper.Input
 
         private void ExecuteDPadAction(ushort direction, bool isRepeat = false)
         {
-            string configKey = direction is DPadLeft or DPadRight ? "m4_dpad_x" : "m4_dpad_y";
+            string button = direction switch
+            {
+                DPadLeft => "dl",
+                DPadRight => "dr",
+                DPadUp => "du",
+                _ => "dd"
+            };
+            string configKey = GetRogLayerKey(button);
             string customAction = AppConfig.GetString(configKey);
+            if (string.IsNullOrWhiteSpace(customAction))
+            {
+                configKey = direction is DPadLeft or DPadRight ? "m4_dpad_x" : "m4_dpad_y";
+                customAction = AppConfig.GetString(configKey);
+            }
 
             if (string.IsNullOrWhiteSpace(customAction))
             {
-                AdjustFrequency(direction);
+                if (ModeControl.IsAllyZ1Extreme()) AdjustFrequency(direction);
             }
             else if (!isRepeat || customAction is "volume_up" or "volume_down" or "brightness_up" or "brightness_down" or "backlight_up" or "backlight_down")
             {
-                InputDispatcher.RunCustomAction(customAction);
+                RunConfiguredAction(customAction, configKey);
             }
         }
 
@@ -236,10 +262,16 @@ namespace GHelper.Input
 
             if (bumper != repeatingBrightnessChordBumper)
             {
-                string customAction = AppConfig.GetString(bumper == RightBumper ? "m4_rb" : "m4_lb");
+                string configKey = GetRogLayerKey(bumper == RightBumper ? "rb" : "lb");
+                string customAction = AppConfig.GetString(configKey);
+                if (string.IsNullOrWhiteSpace(customAction))
+                {
+                    configKey = bumper == RightBumper ? "m4_rb" : "m4_lb";
+                    customAction = AppConfig.GetString(configKey);
+                }
                 if (!string.IsNullOrWhiteSpace(customAction))
                 {
-                    InputDispatcher.RunCustomAction(customAction);
+                    RunConfiguredAction(customAction, configKey);
                 }
                 else
                 {
@@ -250,7 +282,13 @@ namespace GHelper.Input
             }
             else if (now >= nextBrightnessChordRepeatAt)
             {
-                string customAction = AppConfig.GetString(bumper == RightBumper ? "m4_rb" : "m4_lb");
+                string configKey = GetRogLayerKey(bumper == RightBumper ? "rb" : "lb");
+                string customAction = AppConfig.GetString(configKey);
+                if (string.IsNullOrWhiteSpace(customAction))
+                {
+                    configKey = bumper == RightBumper ? "m4_rb" : "m4_lb";
+                    customAction = AppConfig.GetString(configKey);
+                }
                 if (string.IsNullOrWhiteSpace(customAction))
                 {
                     AdjustScreenBrightness(bumper == RightBumper ? 10 : -10);
@@ -258,10 +296,81 @@ namespace GHelper.Input
                 else if (customAction is "volume_up" or "volume_down" or "brightness_up" or "brightness_down" or "backlight_up" or "backlight_down")
                 {
                     // Only repeat volume/brightness related actions to prevent spamming apps or toggles
-                    InputDispatcher.RunCustomAction(customAction);
+                    RunConfiguredAction(customAction, configKey);
                 }
                 nextBrightnessChordRepeatAt = now + BrightnessChordRepeatIntervalMs;
             }
+        }
+
+        private void HandleRogThirdLayer(XInputGamepad gamepad)
+        {
+            if (!InputDispatcher.isRogLongPressed)
+            {
+                previousRogButtons = 0;
+                previousRogLeftTrigger = false;
+                previousRogRightTrigger = false;
+                previousRogStickDirections.Clear();
+                return;
+            }
+
+            // D-pad and bumpers have repeat/fallback handling above.
+            const ushort handledElsewhere = AllDirections | BumperButtons;
+            ushort pressed = (ushort)(gamepad.Buttons & ~handledElsewhere);
+            ushort newlyPressed = (ushort)(pressed & ~previousRogButtons);
+            previousRogButtons = pressed;
+
+            RunRogButton(newlyPressed, AButton, "a");
+            RunRogButton(newlyPressed, BButton, "b");
+            RunRogButton(newlyPressed, XButton, "x");
+            RunRogButton(newlyPressed, YButton, "y");
+            RunRogButton(newlyPressed, LeftStickButton, "ls");
+            RunRogButton(newlyPressed, RightStickButton, "rs");
+            RunRogButton(newlyPressed, BackButton, "vb");
+            RunRogButton(newlyPressed, StartButton, "mb");
+
+            bool leftTrigger = gamepad.LeftTrigger >= TriggerThreshold;
+            bool rightTrigger = gamepad.RightTrigger >= TriggerThreshold;
+            if (leftTrigger && !previousRogLeftTrigger) RunRogAction("lt");
+            if (rightTrigger && !previousRogRightTrigger) RunRogAction("rt");
+            previousRogLeftTrigger = leftTrigger;
+            previousRogRightTrigger = rightTrigger;
+
+            const short stickThreshold = 20000;
+            var stickDirections = new HashSet<string>();
+            if (gamepad.ThumbLX <= -stickThreshold) stickDirections.Add("ls_left");
+            if (gamepad.ThumbLX >= stickThreshold) stickDirections.Add("ls_right");
+            if (gamepad.ThumbLY >= stickThreshold) stickDirections.Add("ls_up");
+            if (gamepad.ThumbLY <= -stickThreshold) stickDirections.Add("ls_down");
+            if (gamepad.ThumbRX <= -stickThreshold) stickDirections.Add("rs_left");
+            if (gamepad.ThumbRX >= stickThreshold) stickDirections.Add("rs_right");
+            if (gamepad.ThumbRY >= stickThreshold) stickDirections.Add("rs_up");
+            if (gamepad.ThumbRY <= -stickThreshold) stickDirections.Add("rs_down");
+            foreach (string direction in stickDirections)
+                if (!previousRogStickDirections.Contains(direction)) RunRogAction(direction);
+            previousRogStickDirections.Clear();
+            previousRogStickDirections.UnionWith(stickDirections);
+        }
+
+        private static void RunRogButton(ushort newlyPressed, ushort mask, string binding)
+        {
+            if ((newlyPressed & mask) != 0) RunRogAction(binding);
+        }
+
+        private static void RunRogAction(string binding)
+        {
+            string configKey = GetRogLayerKey(binding);
+            string action = AppConfig.GetString(configKey);
+            if (!string.IsNullOrWhiteSpace(action)) RunConfiguredAction(action, configKey);
+        }
+
+        private static string GetRogLayerKey(string binding) =>
+            (AllyControl.IsDesktopMode ? "rog_desktop_" : "rog_gamepad_") + binding;
+
+        private static void RunConfiguredAction(string action, string configKey)
+        {
+            if (action == "custom")
+                action = AppConfig.GetString("custom_" + configKey);
+            InputDispatcher.RunCustomAction(action);
         }
 
         private static void AdjustScreenBrightness(int delta)

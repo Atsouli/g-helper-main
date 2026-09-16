@@ -22,6 +22,11 @@ namespace GHelper
         UI.RComboBox comboRsX, comboRsY;
         TextBox textRsX, textRsY;
 
+        Label labelRogLayer;
+        UI.RComboBox comboRogLayer;
+        TextBox textRogLayer;
+        bool updatingRogLayer;
+
         public Handheld()
         {
             InitializeComponent();
@@ -153,6 +158,19 @@ namespace GHelper
             comboRsY = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(138, 240), Size = new Size(295, 40) };
             textRsY = new TextBox { Location = new Point(445, 240), Size = new Size(130, 39), Visible = false };
 
+            labelRogLayer = new Label { AutoSize = true, Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = colorStandard, Location = new Point(8, 65), Size = new Size(125, 32), Text = "Third (Hold ROG)" };
+            comboRogLayer = new UI.RComboBox { BorderColor = colorStandard, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(170, 60), Size = new Size(263, 40) };
+            textRogLayer = new TextBox { Location = new Point(441, 60), Size = new Size(127, 39), Visible = false };
+
+            // Keep the software ROG layer at the top so it cannot be clipped by
+            // Windows DPI scaling. Firmware Primary/Secondary follow underneath.
+            labelPrimary.Location = new Point(8, 115);
+            comboPrimary.Location = new Point(138, 110);
+            comboTurboPrimary.Location = new Point(441, 110);
+            labelSecondary.Location = new Point(8, 165);
+            comboSecondary.Location = new Point(138, 160);
+            comboTurboSecondary.Location = new Point(441, 160);
+
             panelSoftwareBinding.Controls.Add(labelRogLB);
             panelSoftwareBinding.Controls.Add(comboRogLB);
             panelSoftwareBinding.Controls.Add(textRogLB);
@@ -172,6 +190,9 @@ namespace GHelper
             panelBinding.Controls.Add(labelRsY);
             panelBinding.Controls.Add(comboRsY);
             panelBinding.Controls.Add(textRsY);
+            panelBinding.Controls.Add(labelRogLayer);
+            panelBinding.Controls.Add(comboRogLayer);
+            panelBinding.Controls.Add(textRogLayer);
 
             comboRogLB.SelectedValueChanged += ComboRogLB_SelectedValueChanged;
             textRogLB.TextChanged += TextRogLB_TextChanged;
@@ -186,6 +207,8 @@ namespace GHelper
             textRsX.TextChanged += TextRsX_TextChanged;
             comboRsY.SelectedValueChanged += ComboRsY_SelectedValueChanged;
             textRsY.TextChanged += TextRsY_TextChanged;
+            comboRogLayer.SelectedValueChanged += ComboRogLayer_SelectedValueChanged;
+            textRogLayer.TextChanged += TextRogLayer_TextChanged;
 
             checkController.Checked = AppConfig.Is("controller_disabled");
             checkController.CheckedChanged += CheckController_CheckedChanged;
@@ -251,6 +274,12 @@ namespace GHelper
         {
             bool desktop = comboBindingMode.SelectedIndex == 1;
             return (desktop ? "bind2_desktop_" : "bind2_gamepad_") + binding;
+        }
+
+        private string GetRogLayerKey(string binding)
+        {
+            bool desktop = comboBindingMode.SelectedIndex == 1;
+            return (desktop ? "rog_desktop_" : "rog_gamepad_") + binding;
         }
 
         private string GetTurboKey(string binding)
@@ -425,8 +454,9 @@ namespace GHelper
 
             string primary = AppConfig.GetString(GetBindingKey(binding), AppConfig.GetString("bind_" + binding, ""));
             string secondary = AppConfig.GetString(GetBindingKey2(binding), AppConfig.GetString("bind2_" + binding, ""));
+            string rogAction = AppConfig.GetString(GetRogLayerKey(binding));
 
-            if (primary != "" || secondary != "")
+            if (primary != "" || secondary != "" || rogAction != "")
             {
                 button.BorderColor = colorStandard;
                 button.Activated = true;
@@ -464,7 +494,15 @@ namespace GHelper
             SetTurboValue(comboTurboPrimary, AppConfig.Get(GetTurboKey(binding), AppConfig.Get("turbo_" + binding, 0)));
             SetTurboValue(comboTurboSecondary, AppConfig.Get(GetTurboKey2(binding), AppConfig.Get("turbo2_" + binding, 0)));
 
+            updatingRogLayer = true;
+            SetSoftwareKeyCombo(comboRogLayer, textRogLayer, GetRogLayerKey(binding));
+            updatingRogLayer = false;
+            textRogLayer.Visible = comboRogLayer.SelectedValue?.ToString() == "custom";
+
             bool isM = binding == "m1" || binding == "m2";
+            comboRogLayer.Enabled = !isM;
+            textRogLayer.Enabled = !isM;
+            labelRogLayer.Text = isM ? "Third: unavailable" : "Third (Hold ROG)";
             labelRsX.Visible = isM;
             comboRsX.Visible = isM;
             textRsX.Visible = false;
@@ -474,14 +512,38 @@ namespace GHelper
 
             if (isM)
             {
-                panelBinding.Size = new Size(583, 300);
+                labelRsX.Location = new Point(8, 225);
+                comboRsX.Location = new Point(138, 220);
+                textRsX.Location = new Point(445, 220);
+                labelRsY.Location = new Point(8, 275);
+                comboRsY.Location = new Point(138, 270);
+                textRsY.Location = new Point(445, 270);
+                panelBinding.Size = new Size(583, 315);
                 SetSoftwareKeyCombo(comboRsX, textRsX, "m12_rs_x");
                 SetSoftwareKeyCombo(comboRsY, textRsY, "m12_rs_y");
             }
             else
             {
-                panelBinding.Size = new Size(583, 203);
+                panelBinding.Size = new Size(583, 215);
             }
+        }
+
+        private void ComboRogLayer_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (updatingRogLayer || string.IsNullOrEmpty(activeBinding) || isSoftwareBinding(activeBinding)) return;
+            string key = GetRogLayerKey(activeBinding);
+            string action = comboRogLayer.SelectedValue?.ToString() ?? "";
+            textRogLayer.Visible = action == "custom";
+            if (action == "custom") textRogLayer.Focus();
+            if (action != "") AppConfig.Set(key, action);
+            else AppConfig.Remove(key);
+            VisualiseButton(activeButton, activeBinding);
+        }
+
+        private void TextRogLayer_TextChanged(object? sender, EventArgs e)
+        {
+            if (updatingRogLayer || string.IsNullOrEmpty(activeBinding) || isSoftwareBinding(activeBinding)) return;
+            AppConfig.Set("custom_" + GetRogLayerKey(activeBinding), textRogLayer.Text);
         }
 
         private void SetSoftwareKeyCombo(ComboBox combo, TextBox txbox, string name)
