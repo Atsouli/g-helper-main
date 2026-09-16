@@ -73,6 +73,25 @@ namespace GHelper
             InitializeComponent();
             SuspendLayout();
             settingsTabs.SuspendLayout();
+            
+            // Apply borderless & transparent aesthetics
+            FormBorderStyle = FormBorderStyle.None;
+            Opacity = 0.93;
+            
+            // Add custom Close button since header is removed
+            RButton btnClose = new RButton();
+            btnClose.Text = "✕";
+            btnClose.Size = new Size(32, 32);
+            btnClose.Location = new Point(this.ClientSize.Width - btnClose.Width - 10, 10);
+            btnClose.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnClose.BackColor = Color.Transparent;
+            btnClose.ForeColor = Color.IndianRed;
+            btnClose.Cursor = Cursors.Hand;
+            btnClose.Font = new Font("Segoe UI", 12f, FontStyle.Bold);
+            btnClose.Click += (s, e) => this.Close();
+            this.Controls.Add(btnClose);
+            btnClose.BringToFront();
+
             ConfigureSinglePageLayout();
             KeyPreview = true;
             InitTheme(true);
@@ -1369,6 +1388,16 @@ namespace GHelper
 
         protected override void WndProc(ref Message m)
         {
+            // Allow dragging for borderless window
+            if (m.Msg == 0x84) // WM_NCHITTEST
+            {
+                base.WndProc(ref m);
+                if (m.Result == (IntPtr)0x1) // HTCLIENT
+                {
+                    m.Result = (IntPtr)0x2; // HTCAPTION
+                }
+                return;
+            }
 
             if (m.Msg == NativeMethods.WM_POWERBROADCAST && m.WParam == (IntPtr)NativeMethods.PBT_APMSUSPEND)
             {

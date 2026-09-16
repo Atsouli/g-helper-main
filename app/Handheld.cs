@@ -518,13 +518,13 @@ namespace GHelper
                 labelRsY.Location = new Point(8, 275);
                 comboRsY.Location = new Point(138, 270);
                 textRsY.Location = new Point(445, 270);
-                panelBinding.Size = new Size(583, 315);
+                panelBinding.Size = new Size(583, 365);
                 SetSoftwareKeyCombo(comboRsX, textRsX, "m12_rs_x");
                 SetSoftwareKeyCombo(comboRsY, textRsY, "m12_rs_y");
             }
             else
             {
-                panelBinding.Size = new Size(583, 215);
+                panelBinding.Size = new Size(583, 260);
             }
         }
 

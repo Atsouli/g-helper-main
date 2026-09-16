@@ -30,6 +30,7 @@ namespace GHelper.Input
         private static System.Threading.Timer? ccClickTimer;
         private static int ccClickCount;
         private const int RogDoubleClickWindowMs = 350;
+        private static System.Threading.Timer? paddlePreviewTimer;
 
         public static Keys keyProfile = (Keys)AppConfig.Get("keybind_profile", (int)Keys.F5);
         public static Keys keyApp = (Keys)AppConfig.Get("keybind_app", (int)Keys.F12);
@@ -1120,11 +1121,20 @@ namespace GHelper.Input
                     case 165:
                         isPaddlePressed = true;
                         Program.settingsForm.BeginInvoke(() => Program.hardwareOverlay?.SetDragKey(true));
+                        paddlePreviewTimer?.Dispose();
+                        paddlePreviewTimer = new System.Threading.Timer(_ =>
+                        {
+                            if (isPaddlePressed)
+                                Program.settingsForm.BeginInvoke(Program.ShowControllerMappingPreviewM2);
+                        }, null, 350, Timeout.Infinite);
                         KeyProcess("paddle");
                         return;
                     case 0:
                         isPaddlePressed = false;
                         Program.settingsForm.BeginInvoke(() => Program.hardwareOverlay?.SetDragKey(false));
+                        paddlePreviewTimer?.Dispose();
+                        paddlePreviewTimer = null;
+                        Program.settingsForm.BeginInvoke(Program.HideControllerMappingPreviewM2);
                         return;
                     // The Command Center ("play-looking") button below the select key.
                     case 166:

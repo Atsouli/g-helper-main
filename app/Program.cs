@@ -471,9 +471,23 @@ namespace GHelper
             controllerMappingPreview.ShowPreview();
         }
 
+        public static void ShowControllerMappingPreviewM2()
+        {
+            controllerMappingPreview ??= new ControllerMappingPreview();
+            controllerMappingPreview.ShowPreview(PreviewMode.M2);
+        }
+
         public static void HideControllerMappingPreview()
         {
             controllerMappingPreview?.HidePreview();
+        }
+
+        public static void HideControllerMappingPreviewM2()
+        {
+            if (controllerMappingPreview != null && controllerMappingPreview.IsM2Mode)
+            {
+                controllerMappingPreview.HidePreview();
+            }
         }
 
         static void TrayIcon_MouseClick(object? sender, MouseEventArgs e)

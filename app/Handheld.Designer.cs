@@ -547,7 +547,7 @@ namespace GHelper
             panelBindings.Dock = DockStyle.Top;
             panelBindings.Location = new Point(10, 10);
             panelBindings.Name = "panelBindings";
-            panelBindings.Size = new Size(1380, 517);
+            panelBindings.Size = new Size(1380, 580);
             panelBindings.TabIndex = 1;
             // 
             // panelBinding
@@ -562,7 +562,7 @@ namespace GHelper
             panelBinding.Controls.Add(comboTurboSecondary);
             panelBinding.Location = new Point(397, 192);
             panelBinding.Name = "panelBinding";
-            panelBinding.Size = new Size(583, 203);
+            panelBinding.Size = new Size(583, 260);
             panelBinding.TabIndex = 37;
             panelBinding.Visible = false;
             // 

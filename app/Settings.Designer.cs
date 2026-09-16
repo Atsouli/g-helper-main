@@ -223,7 +223,7 @@ namespace GHelper
             panelMatrix.Margin = new Padding(0);
             panelMatrix.Name = "panelMatrix";
             panelMatrix.Padding = new Padding(20, 20, 20, 11);
-            panelMatrix.Size = new Size(827, 183);
+            panelMatrix.Size = new Size(440, 183);
             panelMatrix.TabIndex = 4;
             panelMatrix.TabStop = true;
             // 
@@ -247,7 +247,7 @@ namespace GHelper
             tableLayoutMatrix.RowCount = 1;
             tableLayoutMatrix.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutMatrix.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutMatrix.Size = new Size(787, 72);
+            tableLayoutMatrix.Size = new Size(400, 72);
             tableLayoutMatrix.TabIndex = 43;
             // 
             // comboMatrix
@@ -308,7 +308,7 @@ namespace GHelper
             panelMatrixTitle.Location = new Point(20, 20);
             panelMatrixTitle.Margin = new Padding(4);
             panelMatrixTitle.Name = "panelMatrixTitle";
-            panelMatrixTitle.Size = new Size(787, 40);
+            panelMatrixTitle.Size = new Size(400, 40);
             panelMatrixTitle.TabIndex = 45;
             // 
             // pictureMatrix
@@ -345,7 +345,7 @@ namespace GHelper
             panelBattery.Margin = new Padding(0);
             panelBattery.Name = "panelBattery";
             panelBattery.Padding = new Padding(20, 15, 20, 0);
-            panelBattery.Size = new Size(827, 104);
+            panelBattery.Size = new Size(440, 104);
             panelBattery.TabIndex = 8;
             // 
             // buttonBatteryFull
@@ -359,7 +359,7 @@ namespace GHelper
             buttonBatteryFull.FlatStyle = FlatStyle.Flat;
             buttonBatteryFull.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonBatteryFull.ForeColor = SystemColors.ControlDark;
-            buttonBatteryFull.Location = new Point(728, 102);
+            buttonBatteryFull.Location = new Point(250, 102);
             buttonBatteryFull.Borderless = true;
             buttonBatteryFull.Margin = new Padding(0);
             buttonBatteryFull.Name = "buttonBatteryFull";
@@ -377,7 +377,7 @@ namespace GHelper
             sliderBattery.Max = 100;
             sliderBattery.Min = 40;
             sliderBattery.Name = "sliderBattery";
-            sliderBattery.Size = new Size(707, 40);
+            sliderBattery.Size = new Size(320, 40);
             sliderBattery.Step = 5;
             sliderBattery.TabIndex = 20;
             sliderBattery.Text = "sliderBattery";
@@ -393,16 +393,16 @@ namespace GHelper
             panelBatteryTitle.Margin = new Padding(4);
             panelBatteryTitle.Name = "panelBatteryTitle";
             panelBatteryTitle.Padding = new Padding(0, 0, 0, 4);
-            panelBatteryTitle.Size = new Size(787, 84);
+            panelBatteryTitle.Size = new Size(400, 84);
             panelBatteryTitle.TabIndex = 40;
             // 
             // labelBattery
             // 
             labelBattery.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelBattery.Location = new Point(455, 0);
+            labelBattery.Location = new Point(10, 0);
             labelBattery.Margin = new Padding(8, 0, 8, 0);
             labelBattery.Name = "labelBattery";
-            labelBattery.Size = new Size(324, 84);
+            labelBattery.Size = new Size(390, 84);
             labelBattery.TabIndex = 39;
             labelBattery.Text = "                ";
             labelBattery.TextAlign = ContentAlignment.TopRight;
@@ -438,7 +438,7 @@ namespace GHelper
             panelFooter.Margin = new Padding(0);
             panelFooter.Name = "panelFooter";
             panelFooter.Padding = new Padding(20, 10, 20, 20);
-            panelFooter.Size = new Size(827, 88);
+            panelFooter.Size = new Size(440, 88);
             panelFooter.TabIndex = 11;
             // 
             // tableButtons
@@ -457,7 +457,7 @@ namespace GHelper
             tableButtons.Name = "tableButtons";
             tableButtons.RowCount = 1;
             tableButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableButtons.Size = new Size(787, 58);
+            tableButtons.Size = new Size(400, 58);
             tableButtons.TabIndex = 25;
             // 
             // buttonDonate
@@ -490,7 +490,7 @@ namespace GHelper
             buttonQuit.Dock = DockStyle.Top;
             buttonQuit.FlatStyle = FlatStyle.Flat;
             buttonQuit.Image = Properties.Resources.icons8_quit_32;
-            buttonQuit.Location = new Point(528, 5);
+            buttonQuit.Location = new Point(200, 5);
             buttonQuit.Margin = new Padding(4, 5, 4, 5);
             buttonQuit.Name = "buttonQuit";
             buttonQuit.Secondary = true;
@@ -563,7 +563,7 @@ namespace GHelper
             panelPerformance.Margin = new Padding(0);
             panelPerformance.Name = "panelPerformance";
             panelPerformance.Padding = new Padding(20);
-            panelPerformance.Size = new Size(827, 208);
+            panelPerformance.Size = new Size(440, 208);
             panelPerformance.TabIndex = 0;
             panelPerformance.TabStop = true;
             // 
@@ -586,7 +586,7 @@ namespace GHelper
             tablePerf.Name = "tablePerf";
             tablePerf.RowCount = 1;
             tablePerf.RowStyles.Add(new RowStyle(SizeType.Absolute, 128F));
-            tablePerf.Size = new Size(787, 128);
+            tablePerf.Size = new Size(400, 128);
             tablePerf.TabIndex = 29;
             // 
             // buttonSilent
@@ -686,7 +686,7 @@ namespace GHelper
             panelCPUTitle.Location = new Point(20, 20);
             panelCPUTitle.Margin = new Padding(4);
             panelCPUTitle.Name = "panelCPUTitle";
-            panelCPUTitle.Size = new Size(787, 40);
+            panelCPUTitle.Size = new Size(400, 40);
             panelCPUTitle.TabIndex = 30;
             // 
             // picturePerf
@@ -719,10 +719,10 @@ namespace GHelper
             labelCPUFan.AccessibleRole = AccessibleRole.TitleBar;
             labelCPUFan.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelCPUFan.Cursor = Cursors.Hand;
-            labelCPUFan.Location = new Point(387, 0);
+            labelCPUFan.Location = new Point(10, 0);
             labelCPUFan.Margin = new Padding(8, 0, 8, 0);
             labelCPUFan.Name = "labelCPUFan";
-            labelCPUFan.Size = new Size(400, 36);
+            labelCPUFan.Size = new Size(390, 36);
             labelCPUFan.TabIndex = 33;
             labelCPUFan.Text = "      ";
             labelCPUFan.TextAlign = ContentAlignment.TopRight;
@@ -741,7 +741,7 @@ namespace GHelper
             panelGPU.Margin = new Padding(0);
             panelGPU.Name = "panelGPU";
             panelGPU.Padding = new Padding(20, 20, 20, 0);
-            panelGPU.Size = new Size(827, 432);
+            panelGPU.Size = new Size(440, 432);
             panelGPU.TabIndex = 1;
             panelGPU.TabStop = true;
             // 
@@ -752,7 +752,7 @@ namespace GHelper
             labelTipGPU.Location = new Point(20, 396);
             labelTipGPU.Margin = new Padding(4, 0, 4, 0);
             labelTipGPU.Name = "labelTipGPU";
-            labelTipGPU.Size = new Size(787, 36);
+            labelTipGPU.Size = new Size(400, 36);
             labelTipGPU.TabIndex = 20;
             // 
             // tableAMD
@@ -772,7 +772,7 @@ namespace GHelper
             tableAMD.Name = "tableAMD";
             tableAMD.RowCount = 1;
             tableAMD.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
-            tableAMD.Size = new Size(787, 80);
+            tableAMD.Size = new Size(400, 80);
             tableAMD.TabIndex = 24;
             tableAMD.Visible = false;
             // 
@@ -864,7 +864,7 @@ namespace GHelper
             tableGPU.RowCount = 1;
             tableGPU.RowStyles.Add(new RowStyle(SizeType.Absolute, 128F));
             tableGPU.RowStyles.Add(new RowStyle(SizeType.Absolute, 128F));
-            tableGPU.Size = new Size(787, 256);
+            tableGPU.Size = new Size(400, 256);
             tableGPU.TabIndex = 16;
             // 
             // buttonStopGPU
@@ -1012,7 +1012,7 @@ namespace GHelper
             panelGPUTitle.Location = new Point(20, 20);
             panelGPUTitle.Margin = new Padding(4);
             panelGPUTitle.Name = "panelGPUTitle";
-            panelGPUTitle.Size = new Size(787, 40);
+            panelGPUTitle.Size = new Size(400, 40);
             panelGPUTitle.TabIndex = 21;
             // 
             // pictureGPU
@@ -1040,10 +1040,10 @@ namespace GHelper
             // labelGPUFan
             // 
             labelGPUFan.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelGPUFan.Location = new Point(387, 0);
+            labelGPUFan.Location = new Point(10, 0);
             labelGPUFan.Margin = new Padding(8, 0, 8, 0);
             labelGPUFan.Name = "labelGPUFan";
-            labelGPUFan.Size = new Size(400, 35);
+            labelGPUFan.Size = new Size(390, 35);
             labelGPUFan.TabIndex = 20;
             labelGPUFan.Text = "         ";
             labelGPUFan.TextAlign = ContentAlignment.TopRight;
@@ -1062,7 +1062,7 @@ namespace GHelper
             panelScreen.Margin = new Padding(0);
             panelScreen.Name = "panelScreen";
             panelScreen.Padding = new Padding(20, 11, 20, 0);
-            panelScreen.Size = new Size(827, 187);
+            panelScreen.Size = new Size(440, 187);
             panelScreen.TabIndex = 2;
             panelScreen.TabStop = true;
             // 
@@ -1074,7 +1074,7 @@ namespace GHelper
             panelOrientation.Margin = new Padding(0);
             panelOrientation.Name = "panelOrientation";
             panelOrientation.Padding = new Padding(20, 10, 20, 10);
-            panelOrientation.Size = new Size(819, 76);
+            panelOrientation.Size = new Size(432, 76);
             panelOrientation.TabIndex = 0;
             // 
             // labelTipScreen
@@ -1084,7 +1084,7 @@ namespace GHelper
             labelTipScreen.Location = new Point(20, 191);
             labelTipScreen.Margin = new Padding(4, 0, 4, 0);
             labelTipScreen.Name = "labelTipScreen";
-            labelTipScreen.Size = new Size(787, 36);
+            labelTipScreen.Size = new Size(400, 36);
             labelTipScreen.TabIndex = 24;
             // 
             // sliderScreenBrightness
@@ -1095,7 +1095,7 @@ namespace GHelper
             sliderScreenBrightness.Max = 100;
             sliderScreenBrightness.Min = 0;
             sliderScreenBrightness.Name = "sliderScreenBrightness";
-            sliderScreenBrightness.Size = new Size(787, 40);
+            sliderScreenBrightness.Size = new Size(400, 40);
             sliderScreenBrightness.Step = 5;
             sliderScreenBrightness.TabIndex = 25;
             sliderScreenBrightness.Text = "sliderScreenBrightness";
@@ -1123,7 +1123,7 @@ namespace GHelper
             tableScreen.RowCount = 1;
             tableScreen.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
             tableScreen.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableScreen.Size = new Size(787, 100);
+            tableScreen.Size = new Size(400, 100);
             tableScreen.TabIndex = 23;
             // 
             // buttonScreenAuto
@@ -1200,7 +1200,7 @@ namespace GHelper
             buttonOrientation.MinimumSize = new Size(0, 56);
             buttonOrientation.Name = "buttonOrientation";
             buttonOrientation.Secondary = false;
-            buttonOrientation.Size = new Size(779, 56);
+            buttonOrientation.Size = new Size(392, 56);
             buttonOrientation.TabIndex = 12;
             buttonOrientation.Text = "Orientation";
             buttonOrientation.UseVisualStyleBackColor = false;
@@ -1255,16 +1255,16 @@ namespace GHelper
             panelScreenTitle.Location = new Point(20, 11);
             panelScreenTitle.Margin = new Padding(4);
             panelScreenTitle.Name = "panelScreenTitle";
-            panelScreenTitle.Size = new Size(787, 40);
+            panelScreenTitle.Size = new Size(400, 40);
             panelScreenTitle.TabIndex = 25;
             // 
             // labelMidFan
             // 
             labelMidFan.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelMidFan.Location = new Point(500, 0);
+            labelMidFan.Location = new Point(10, 0);
             labelMidFan.Margin = new Padding(8, 0, 8, 0);
             labelMidFan.Name = "labelMidFan";
-            labelMidFan.Size = new Size(285, 35);
+            labelMidFan.Size = new Size(390, 35);
             labelMidFan.TabIndex = 28;
             labelMidFan.Text = "         ";
             labelMidFan.TextAlign = ContentAlignment.TopRight;
@@ -1304,7 +1304,7 @@ namespace GHelper
             panelKeyboard.Margin = new Padding(0);
             panelKeyboard.Name = "panelKeyboard";
             panelKeyboard.Padding = new Padding(20, 20, 20, 0);
-            panelKeyboard.Size = new Size(827, 146);
+            panelKeyboard.Size = new Size(440, 146);
             panelKeyboard.TabIndex = 6;
             panelKeyboard.TabStop = true;
             // 
@@ -1318,7 +1318,7 @@ namespace GHelper
             labelBacklight.Margin = new Padding(4, 0, 4, 0);
             labelBacklight.Name = "labelBacklight";
             labelBacklight.Padding = new Padding(4, 0, 4, 0);
-            labelBacklight.Size = new Size(787, 34);
+            labelBacklight.Size = new Size(400, 34);
             labelBacklight.TabIndex = 43;
             // 
             // tableLayoutKeyboard
@@ -1338,7 +1338,7 @@ namespace GHelper
             tableLayoutKeyboard.Name = "tableLayoutKeyboard";
             tableLayoutKeyboard.RowCount = 1;
             tableLayoutKeyboard.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutKeyboard.Size = new Size(787, 52);
+            tableLayoutKeyboard.Size = new Size(400, 52);
             tableLayoutKeyboard.TabIndex = 39;
             // 
             // buttonKeyboard
@@ -1407,7 +1407,7 @@ namespace GHelper
             panelKeyboardTitle.Margin = new Padding(0);
             panelKeyboardTitle.Name = "panelKeyboardTitle";
             panelKeyboardTitle.Padding = new Padding(0, 0, 5, 0);
-            panelKeyboardTitle.Size = new Size(787, 40);
+            panelKeyboardTitle.Size = new Size(400, 40);
             panelKeyboardTitle.TabIndex = 40;
             // 
             // buttonFnLock
@@ -1422,7 +1422,7 @@ namespace GHelper
             buttonFnLock.FlatStyle = FlatStyle.Flat;
             buttonFnLock.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonFnLock.ForeColor = SystemColors.ControlDark;
-            buttonFnLock.Location = new Point(675, 0);
+            buttonFnLock.Location = new Point(300, 0);
             buttonFnLock.Margin = new Padding(0);
             buttonFnLock.Name = "buttonFnLock";
             buttonFnLock.Secondary = true;
@@ -1465,7 +1465,7 @@ namespace GHelper
             panelRearLight.Margin = new Padding(0);
             panelRearLight.Name = "panelRearLight";
             panelRearLight.Padding = new Padding(20, 20, 20, 0);
-            panelRearLight.Size = new Size(827, 112);
+            panelRearLight.Size = new Size(440, 112);
             panelRearLight.TabIndex = 7;
             panelRearLight.TabStop = true;
             panelRearLight.Visible = false;
@@ -1486,7 +1486,7 @@ namespace GHelper
             tableLayoutRearLight.Name = "tableLayoutRearLight";
             tableLayoutRearLight.RowCount = 1;
             tableLayoutRearLight.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutRearLight.Size = new Size(787, 52);
+            tableLayoutRearLight.Size = new Size(400, 52);
             tableLayoutRearLight.TabIndex = 39;
             //
             // buttonRearColor
@@ -1535,7 +1535,7 @@ namespace GHelper
             panelRearLightTitle.Margin = new Padding(0);
             panelRearLightTitle.Name = "panelRearLightTitle";
             panelRearLightTitle.Padding = new Padding(0, 0, 5, 0);
-            panelRearLightTitle.Size = new Size(787, 40);
+            panelRearLightTitle.Size = new Size(400, 40);
             panelRearLightTitle.TabIndex = 40;
             // 
             // labelRearLight
@@ -1569,7 +1569,7 @@ namespace GHelper
             panelStartup.Margin = new Padding(0);
             panelStartup.Name = "panelStartup";
             panelStartup.Padding = new Padding(20, 0, 20, 0);
-            panelStartup.Size = new Size(827, 50);
+            panelStartup.Size = new Size(440, 50);
             panelStartup.TabIndex = 9;
             // 
             // labelCharge
@@ -1577,7 +1577,7 @@ namespace GHelper
             labelCharge.Cursor = Cursors.Hand;
             labelCharge.Dock = DockStyle.Right;
             labelCharge.ForeColor = SystemColors.ControlDark;
-            labelCharge.Location = new Point(442, 0);
+            labelCharge.Location = new Point(150, 0);
             labelCharge.Margin = new Padding(0);
             labelCharge.Name = "labelCharge";
             labelCharge.Size = new Size(365, 50);
@@ -1594,7 +1594,7 @@ namespace GHelper
             panelPeripherals.Margin = new Padding(0);
             panelPeripherals.Name = "panelPeripherals";
             panelPeripherals.Padding = new Padding(20, 5, 20, 10);
-            panelPeripherals.Size = new Size(827, 143);
+            panelPeripherals.Size = new Size(440, 143);
             panelPeripherals.TabIndex = 7;
             panelPeripherals.Visible = false;
             // 
@@ -1616,7 +1616,7 @@ namespace GHelper
             tableLayoutPeripherals.Name = "tableLayoutPeripherals";
             tableLayoutPeripherals.RowCount = 1;
             tableLayoutPeripherals.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPeripherals.Size = new Size(787, 128);
+            tableLayoutPeripherals.Size = new Size(400, 128);
             tableLayoutPeripherals.TabIndex = 43;
             // 
             // buttonPeripheral3
@@ -1703,7 +1703,7 @@ namespace GHelper
             panelAlly.Margin = new Padding(0);
             panelAlly.Name = "panelAlly";
             panelAlly.Padding = new Padding(20, 20, 20, 0);
-            panelAlly.Size = new Size(827, 140);
+            panelAlly.Size = new Size(440, 140);
             panelAlly.TabIndex = 5;
             panelAlly.TabStop = true;
             panelAlly.Visible = false;
@@ -1723,7 +1723,7 @@ namespace GHelper
             tableLayoutAlly.Name = "tableLayoutAlly";
             tableLayoutAlly.RowCount = 1;
             tableLayoutAlly.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
-            tableLayoutAlly.Size = new Size(787, 80);
+            tableLayoutAlly.Size = new Size(400, 80);
             tableLayoutAlly.TabIndex = 23;
             // 
             // panelController
@@ -1734,7 +1734,7 @@ namespace GHelper
             panelController.Margin = new Padding(0);
             panelController.Name = "panelController";
             panelController.Padding = new Padding(20, 10, 20, 10);
-            panelController.Size = new Size(819, 76);
+            panelController.Size = new Size(432, 76);
             panelController.TabIndex = 0;
             // 
             // buttonController
@@ -1756,7 +1756,7 @@ namespace GHelper
             buttonController.MinimumSize = new Size(0, 56);
             buttonController.Name = "buttonController";
             buttonController.Secondary = true;
-            buttonController.Size = new Size(779, 56);
+            buttonController.Size = new Size(392, 56);
             buttonController.TabIndex = 11;
             buttonController.Text = "Controller Settings";
             buttonController.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -1814,7 +1814,7 @@ namespace GHelper
             panelAllyTitle.Location = new Point(20, 20);
             panelAllyTitle.Margin = new Padding(4);
             panelAllyTitle.Name = "panelAllyTitle";
-            panelAllyTitle.Size = new Size(787, 40);
+            panelAllyTitle.Size = new Size(400, 40);
             panelAllyTitle.TabIndex = 25;
             // 
             // pictureAlly
@@ -1852,7 +1852,7 @@ namespace GHelper
             panelGamma.Margin = new Padding(0);
             panelGamma.Name = "panelGamma";
             panelGamma.Padding = new Padding(20, 11, 20, 11);
-            panelGamma.Size = new Size(827, 233);
+            panelGamma.Size = new Size(440, 233);
             panelGamma.TabIndex = 3;
             panelGamma.Visible = false;
             // 
@@ -1864,7 +1864,7 @@ namespace GHelper
             labelVisual.Margin = new Padding(4, 0, 4, 0);
             labelVisual.Name = "labelVisual";
             labelVisual.Padding = new Padding(4);
-            labelVisual.Size = new Size(800, 52);
+            labelVisual.Size = new Size(413, 52);
             labelVisual.TabIndex = 3;
             labelVisual.Text = "Visual Modes are not available when HDR is active";
             labelVisual.Visible = false;
@@ -1891,7 +1891,7 @@ namespace GHelper
             tableVisual.RowCount = 1;
             tableVisual.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableVisual.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableVisual.Size = new Size(787, 79);
+            tableVisual.Size = new Size(400, 79);
             tableVisual.TabIndex = 2;
             tableVisual.Visible = false;
             // 
@@ -1985,7 +1985,7 @@ namespace GHelper
             sliderGamma.Max = 100;
             sliderGamma.Min = 0;
             sliderGamma.Name = "sliderGamma";
-            sliderGamma.Size = new Size(787, 40);
+            sliderGamma.Size = new Size(400, 40);
             sliderGamma.Step = 5;
             sliderGamma.TabIndex = 1;
             sliderGamma.Text = "sliderGamma";
@@ -2001,16 +2001,16 @@ namespace GHelper
             panelGammaTitle.Location = new Point(20, 11);
             panelGammaTitle.Margin = new Padding(4);
             panelGammaTitle.Name = "panelGammaTitle";
-            panelGammaTitle.Size = new Size(787, 40);
+            panelGammaTitle.Size = new Size(400, 40);
             panelGammaTitle.TabIndex = 0;
             // 
             // labelGamma
             // 
             labelGamma.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            labelGamma.Location = new Point(675, 0);
+            labelGamma.Location = new Point(150, 0);
             labelGamma.Margin = new Padding(4, 0, 4, 0);
             labelGamma.Name = "labelGamma";
-            labelGamma.Size = new Size(107, 32);
+            labelGamma.Size = new Size(250, 32);
             labelGamma.TabIndex = 39;
             labelGamma.Text = "                ";
             labelGamma.TextAlign = ContentAlignment.TopRight;
@@ -2048,7 +2048,7 @@ namespace GHelper
             panelCustomButtons.Margin = new Padding(0);
             panelCustomButtons.Name = "panelCustomButtons";
             panelCustomButtons.Padding = new Padding(14, 12, 14, 14);
-            panelCustomButtons.Size = new Size(827, 174);
+            panelCustomButtons.Size = new Size(440, 174);
             panelCustomButtons.TabIndex = 10;
             panelCustomButtons.TabStop = true;
             // 
@@ -2066,7 +2066,7 @@ namespace GHelper
             tableCustomButtons.Name = "tableCustomButtons";
             tableCustomButtons.RowCount = 1;
             tableCustomButtons.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
-            tableCustomButtons.Size = new Size(799, 96);
+            tableCustomButtons.Size = new Size(412, 96);
             tableCustomButtons.TabIndex = 1;
             // 
             // panelCustomButtonsTitle
@@ -2078,7 +2078,7 @@ namespace GHelper
             panelCustomButtonsTitle.Margin = new Padding(0);
             panelCustomButtonsTitle.Name = "panelCustomButtonsTitle";
             panelCustomButtonsTitle.Padding = new Padding(6, 3, 8, 5);
-            panelCustomButtonsTitle.Size = new Size(799, 48);
+            panelCustomButtonsTitle.Size = new Size(412, 48);
             panelCustomButtonsTitle.TabIndex = 0;
             // 
             // buttonAddCustom
@@ -2090,7 +2090,7 @@ namespace GHelper
             buttonAddCustom.Dock = DockStyle.Right;
             buttonAddCustom.FlatAppearance.BorderSize = 0;
             buttonAddCustom.FlatStyle = FlatStyle.Flat;
-            buttonAddCustom.Location = new Point(663, 3);
+            buttonAddCustom.Location = new Point(300, 3);
             buttonAddCustom.Margin = new Padding(0);
             buttonAddCustom.Name = "buttonAddCustom";
             buttonAddCustom.Secondary = true;
@@ -2125,7 +2125,7 @@ namespace GHelper
             panelVersion.MinimumSize = new Size(0, 50);
             panelVersion.Name = "panelVersion";
             panelVersion.Padding = new Padding(20, 5, 24, 5);
-            panelVersion.Size = new Size(827, 50);
+            panelVersion.Size = new Size(440, 50);
             panelVersion.TabIndex = 10;
             // 
             // buttonEnergySaver
@@ -2140,7 +2140,7 @@ namespace GHelper
             buttonEnergySaver.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonEnergySaver.ForeColor = SystemColors.ControlDark;
             buttonEnergySaver.ImageAlign = ContentAlignment.MiddleLeft;
-            buttonEnergySaver.Location = new Point(640, 5);
+            buttonEnergySaver.Location = new Point(300, 5);
             buttonEnergySaver.Margin = new Padding(0);
             buttonEnergySaver.Name = "buttonEnergySaver";
             buttonEnergySaver.Secondary = true;
@@ -2162,7 +2162,7 @@ namespace GHelper
             buttonAmdOled.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonAmdOled.ForeColor = SystemColors.ControlDark;
             buttonAmdOled.ImageAlign = ContentAlignment.MiddleLeft;
-            buttonAmdOled.Location = new Point(640, 5);
+            buttonAmdOled.Location = new Point(300, 5);
             buttonAmdOled.Margin = new Padding(0);
             buttonAmdOled.Name = "buttonAmdOled";
             buttonAmdOled.Secondary = true;
@@ -2184,7 +2184,7 @@ namespace GHelper
             buttonArmoury.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonArmoury.ForeColor = SystemColors.ControlDark;
             buttonArmoury.ImageAlign = ContentAlignment.MiddleLeft;
-            buttonArmoury.Location = new Point(640, 5);
+            buttonArmoury.Location = new Point(300, 5);
             buttonArmoury.Margin = new Padding(0);
             buttonArmoury.Name = "buttonArmoury";
             buttonArmoury.Secondary = true;
@@ -2238,7 +2238,7 @@ namespace GHelper
             settingsTabs.Location = new Point(11, 11);
             settingsTabs.Name = "settingsTabs";
             settingsTabs.SelectedIndex = 0;
-            settingsTabs.Size = new Size(827, 1178);
+            settingsTabs.Size = new Size(440, 1178);
             settingsTabs.TabIndex = 0;
             // 
             // tabPerformance
@@ -2264,7 +2264,7 @@ namespace GHelper
             tabPerformance.Location = new Point(4, 46);
             tabPerformance.Name = "tabPerformance";
             tabPerformance.Padding = new Padding(0, 8, 0, 8);
-            tabPerformance.Size = new Size(819, 1128);
+            tabPerformance.Size = new Size(432, 1128);
             tabPerformance.TabIndex = 0;
             tabPerformance.Text = "All Settings";
             // 
@@ -2275,7 +2275,7 @@ namespace GHelper
             tabDisplay.Location = new Point(4, 46);
             tabDisplay.Name = "tabDisplay";
             tabDisplay.Padding = new Padding(0, 8, 0, 8);
-            tabDisplay.Size = new Size(819, 1128);
+            tabDisplay.Size = new Size(432, 1128);
             tabDisplay.TabIndex = 1;
             tabDisplay.Text = "Display & Light";
             // 
@@ -2286,7 +2286,7 @@ namespace GHelper
             tabDevices.Location = new Point(4, 46);
             tabDevices.Name = "tabDevices";
             tabDevices.Padding = new Padding(0, 8, 0, 8);
-            tabDevices.Size = new Size(819, 1128);
+            tabDevices.Size = new Size(432, 1128);
             tabDevices.TabIndex = 2;
             tabDevices.Text = "Devices, System & Shortcuts";
             // 
@@ -2297,7 +2297,7 @@ namespace GHelper
             tabShortcuts.Location = new Point(4, 46);
             tabShortcuts.Name = "tabShortcuts";
             tabShortcuts.Padding = new Padding(0, 8, 0, 8);
-            tabShortcuts.Size = new Size(819, 1128);
+            tabShortcuts.Size = new Size(432, 1128);
             tabShortcuts.TabIndex = 3;
             tabShortcuts.Text = "Shortcuts";
             // 
@@ -2305,13 +2305,13 @@ namespace GHelper
             // 
             AutoScaleDimensions = new SizeF(192F, 192F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(849, 1200);
+            ClientSize = new Size(460, 1200);
             Controls.Add(settingsTabs);
             Margin = new Padding(8, 4, 8, 4);
             MaximizeBox = false;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimizeBox = false;
-            MinimumSize = new Size(821, 71);
+            MinimumSize = new Size(460, 71);
             Name = "SettingsForm";
             Padding = new Padding(11);
             ShowIcon = false;

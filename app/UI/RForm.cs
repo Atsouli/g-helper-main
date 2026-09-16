@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System.Runtime.InteropServices;
 
 namespace GHelper.UI
@@ -69,29 +69,31 @@ namespace GHelper.UI
 
             if (darkTheme)
             {
-                buttonMain = Color.FromArgb(255, 46, 46, 46);
-                buttonSecond = Color.FromArgb(255, 36, 36, 36);
+                // OLED True-Black theme
+                buttonMain = Color.FromArgb(255, 12, 12, 12);
+                buttonSecond = Color.FromArgb(255, 18, 18, 18);
 
-                formBack = Color.FromArgb(255, 28, 28, 28);
-                foreMain = Color.FromArgb(255, 240, 240, 240);
-                borderMain = Color.FromArgb(255, 55, 55, 55);
-                borderSecond = Color.FromArgb(255, 42, 42, 42);
+                formBack = Color.Black; // Pure black for OLED
+                foreMain = Color.White;
+                borderMain = Color.FromArgb(255, 45, 45, 45);
+                borderSecond = Color.FromArgb(255, 30, 30, 30);
 
-                chartMain = Color.FromArgb(255, 35, 35, 35);
-                chartGrid = Color.FromArgb(255, 70, 70, 70);
+                chartMain = Color.Black;
+                chartGrid = Color.FromArgb(255, 50, 50, 50);
             }
             else
             {
-                buttonMain = SystemColors.ControlLightLight;
-                buttonSecond = SystemColors.ControlLight;
+                // Vibrant light theme (warm pastel/sunset)
+                buttonMain = Color.FromArgb(255, 255, 245, 250);
+                buttonSecond = Color.FromArgb(255, 255, 235, 240);
 
-                formBack = SystemColors.Control;
-                foreMain = SystemColors.ControlText;
-                borderMain = Color.FromArgb(255, 220, 220, 220);
-                borderSecond = Color.FromArgb(255, 215, 215, 215);
+                formBack = Color.FromArgb(255, 252, 248, 255);
+                foreMain = Color.FromArgb(255, 60, 40, 80);
+                borderMain = Color.FromArgb(255, 255, 200, 220);
+                borderSecond = Color.FromArgb(255, 255, 180, 200);
 
-                chartMain = SystemColors.ControlLightLight;
-                chartGrid = Color.LightGray;
+                chartMain = Color.FromArgb(255, 255, 250, 255);
+                chartGrid = Color.FromArgb(255, 255, 190, 210);
             }
         }
 
