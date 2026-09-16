@@ -10,6 +10,18 @@ namespace GHelper
         static string activeBinding = "";
         static RButton? activeButton;
 
+        Label labelRogLB, labelRogRB;
+        UI.RComboBox comboRogLB, comboRogRB;
+        TextBox textRogLB, textRogRB;
+
+        Label labelRogDPadX, labelRogDPadY;
+        UI.RComboBox comboRogDPadX, comboRogDPadY;
+        TextBox textRogDPadX, textRogDPadY;
+
+        Label labelRsX, labelRsY;
+        UI.RComboBox comboRsX, comboRsY;
+        TextBox textRsX, textRsY;
+
         public Handheld()
         {
             InitializeComponent();
@@ -116,6 +128,64 @@ namespace GHelper
             textSoftwareSecondary.TextChanged += TextSoftwareSecondary_TextChanged;
             comboSoftwareDouble.SelectedValueChanged += ComboSoftwareDouble_SelectedValueChanged;
             textSoftwareDouble.TextChanged += TextSoftwareDouble_TextChanged;
+
+            labelRogLB = new Label { AutoSize = true, Font = labelSoftwareDouble.Font, Location = new Point(33, 315), Size = new Size(148, 32), Text = "ROG + LB:" };
+            comboRogLB = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(38, 360), Size = new Size(300, 40) };
+            textRogLB = new TextBox { Location = new Point(345, 360), Size = new Size(200, 39), Visible = false };
+
+            labelRogRB = new Label { AutoSize = true, Font = labelSoftwareDouble.Font, Location = new Point(33, 405), Size = new Size(148, 32), Text = "ROG + RB:" };
+            comboRogRB = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(38, 450), Size = new Size(300, 40) };
+            textRogRB = new TextBox { Location = new Point(345, 450), Size = new Size(200, 39), Visible = false };
+
+            labelRogDPadX = new Label { AutoSize = true, Font = labelSoftwareDouble.Font, Location = new Point(33, 495), Size = new Size(148, 32), Text = "ROG + DPad ←/→:" };
+            comboRogDPadX = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(38, 540), Size = new Size(300, 40) };
+            textRogDPadX = new TextBox { Location = new Point(345, 540), Size = new Size(200, 39), Visible = false };
+
+            labelRogDPadY = new Label { AutoSize = true, Font = labelSoftwareDouble.Font, Location = new Point(33, 585), Size = new Size(148, 32), Text = "ROG + DPad ↑/↓:" };
+            comboRogDPadY = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(38, 630), Size = new Size(300, 40) };
+            textRogDPadY = new TextBox { Location = new Point(345, 630), Size = new Size(200, 39), Visible = false };
+
+            labelRsX = new Label { AutoSize = true, Font = new Font("Segoe UI", 9F), Location = new Point(8, 185), Size = new Size(125, 32), Text = "RS ←/→:" };
+            comboRsX = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(138, 180), Size = new Size(295, 40) };
+            textRsX = new TextBox { Location = new Point(445, 180), Size = new Size(130, 39), Visible = false };
+
+            labelRsY = new Label { AutoSize = true, Font = new Font("Segoe UI", 9F), Location = new Point(8, 245), Size = new Size(125, 32), Text = "RS ↑/↓:" };
+            comboRsY = new UI.RComboBox { BorderColor = Color.White, ButtonColor = Color.FromArgb(255, 255, 255), DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true, Location = new Point(138, 240), Size = new Size(295, 40) };
+            textRsY = new TextBox { Location = new Point(445, 240), Size = new Size(130, 39), Visible = false };
+
+            panelSoftwareBinding.Controls.Add(labelRogLB);
+            panelSoftwareBinding.Controls.Add(comboRogLB);
+            panelSoftwareBinding.Controls.Add(textRogLB);
+            panelSoftwareBinding.Controls.Add(labelRogRB);
+            panelSoftwareBinding.Controls.Add(comboRogRB);
+            panelSoftwareBinding.Controls.Add(textRogRB);
+            panelSoftwareBinding.Controls.Add(labelRogDPadX);
+            panelSoftwareBinding.Controls.Add(comboRogDPadX);
+            panelSoftwareBinding.Controls.Add(textRogDPadX);
+            panelSoftwareBinding.Controls.Add(labelRogDPadY);
+            panelSoftwareBinding.Controls.Add(comboRogDPadY);
+            panelSoftwareBinding.Controls.Add(textRogDPadY);
+
+            panelBinding.Controls.Add(labelRsX);
+            panelBinding.Controls.Add(comboRsX);
+            panelBinding.Controls.Add(textRsX);
+            panelBinding.Controls.Add(labelRsY);
+            panelBinding.Controls.Add(comboRsY);
+            panelBinding.Controls.Add(textRsY);
+
+            comboRogLB.SelectedValueChanged += ComboRogLB_SelectedValueChanged;
+            textRogLB.TextChanged += TextRogLB_TextChanged;
+            comboRogRB.SelectedValueChanged += ComboRogRB_SelectedValueChanged;
+            textRogRB.TextChanged += TextRogRB_TextChanged;
+            comboRogDPadX.SelectedValueChanged += ComboRogDPadX_SelectedValueChanged;
+            textRogDPadX.TextChanged += TextRogDPadX_TextChanged;
+            comboRogDPadY.SelectedValueChanged += ComboRogDPadY_SelectedValueChanged;
+            textRogDPadY.TextChanged += TextRogDPadY_TextChanged;
+
+            comboRsX.SelectedValueChanged += ComboRsX_SelectedValueChanged;
+            textRsX.TextChanged += TextRsX_TextChanged;
+            comboRsY.SelectedValueChanged += ComboRsY_SelectedValueChanged;
+            textRsY.TextChanged += TextRsY_TextChanged;
 
             checkController.Checked = AppConfig.Is("controller_disabled");
             checkController.CheckedChanged += CheckController_CheckedChanged;
@@ -393,6 +463,25 @@ namespace GHelper
 
             SetTurboValue(comboTurboPrimary, AppConfig.Get(GetTurboKey(binding), AppConfig.Get("turbo_" + binding, 0)));
             SetTurboValue(comboTurboSecondary, AppConfig.Get(GetTurboKey2(binding), AppConfig.Get("turbo2_" + binding, 0)));
+
+            bool isM = binding == "m1" || binding == "m2";
+            labelRsX.Visible = isM;
+            comboRsX.Visible = isM;
+            textRsX.Visible = false;
+            labelRsY.Visible = isM;
+            comboRsY.Visible = isM;
+            textRsY.Visible = false;
+
+            if (isM)
+            {
+                panelBinding.Size = new Size(583, 300);
+                SetSoftwareKeyCombo(comboRsX, textRsX, "m12_rs_x");
+                SetSoftwareKeyCombo(comboRsY, textRsY, "m12_rs_y");
+            }
+            else
+            {
+                panelBinding.Size = new Size(583, 203);
+            }
         }
 
         private void SetSoftwareKeyCombo(ComboBox combo, TextBox txbox, string name)
@@ -441,6 +530,13 @@ namespace GHelper
             }
 
             customActions.Add("rtss_overlay", "RTSS OSD");
+
+            if (name == "m4_lb") customActions[""] = "Brightness -10%";
+            if (name == "m4_rb") customActions[""] = "Brightness +10%";
+            if (name == "m4_dpad_x") customActions[""] = "CPU max -/+ 100 MHz";
+            if (name == "m4_dpad_y") customActions[""] = "GPU clock +/- 100 MHz";
+            if (name == "m12_rs_x") customActions[""] = "Brightness";
+            if (name == "m12_rs_y") customActions[""] = "Scroll";
 
             string? json = AppConfig.GetString(SettingsForm.CustomButtonsConfigKey);
             if (!string.IsNullOrWhiteSpace(json))
@@ -496,6 +592,33 @@ namespace GHelper
             textSoftwareDouble.Visible = false;
             if (supportsDoubleClick)
                 SetSoftwareKeyCombo(comboSoftwareDouble, textSoftwareDouble, binding + "_double");
+
+            bool supportsRog = binding == "m4";
+            labelRogLB.Visible = supportsRog;
+            comboRogLB.Visible = supportsRog;
+            textRogLB.Visible = false;
+            labelRogRB.Visible = supportsRog;
+            comboRogRB.Visible = supportsRog;
+            textRogRB.Visible = false;
+            labelRogDPadX.Visible = supportsRog;
+            comboRogDPadX.Visible = supportsRog;
+            textRogDPadX.Visible = false;
+            labelRogDPadY.Visible = supportsRog;
+            comboRogDPadY.Visible = supportsRog;
+            textRogDPadY.Visible = false;
+
+            if (supportsRog)
+            {
+                panelSoftwareBinding.Size = new Size(583, 690);
+                SetSoftwareKeyCombo(comboRogLB, textRogLB, "m4_lb");
+                SetSoftwareKeyCombo(comboRogRB, textRogRB, "m4_rb");
+                SetSoftwareKeyCombo(comboRogDPadX, textRogDPadX, "m4_dpad_x");
+                SetSoftwareKeyCombo(comboRogDPadY, textRogDPadY, "m4_dpad_y");
+            }
+            else
+            {
+                panelSoftwareBinding.Size = new Size(583, 335);
+            }
         }
 
         private void ComboSoftware_SelectedValueChanged(object? sender, EventArgs e)
@@ -580,7 +703,107 @@ namespace GHelper
             AppConfig.Set("custom_" + activeBinding + "_double", textSoftwareDouble.Text);
         }
 
+        private void ComboRogLB_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            string action = comboRogLB.SelectedValue?.ToString() ?? "";
+            textRogLB.Visible = action == "custom";
+            if (action == "custom") textRogLB.Focus();
+            if (action != "") AppConfig.Set("m4_lb", action);
+            else AppConfig.Remove("m4_lb");
+            VisualiseButton(activeButton, activeBinding, true);
+        }
 
+        private void TextRogLB_TextChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            AppConfig.Set("custom_m4_lb", textRogLB.Text);
+        }
+
+        private void ComboRogRB_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            string action = comboRogRB.SelectedValue?.ToString() ?? "";
+            textRogRB.Visible = action == "custom";
+            if (action == "custom") textRogRB.Focus();
+            if (action != "") AppConfig.Set("m4_rb", action);
+            else AppConfig.Remove("m4_rb");
+            VisualiseButton(activeButton, activeBinding, true);
+        }
+
+        private void TextRogRB_TextChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            AppConfig.Set("custom_m4_rb", textRogRB.Text);
+        }
+
+        private void ComboRogDPadX_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            string action = comboRogDPadX.SelectedValue?.ToString() ?? "";
+            textRogDPadX.Visible = action == "custom";
+            if (action == "custom") textRogDPadX.Focus();
+            if (action != "") AppConfig.Set("m4_dpad_x", action);
+            else AppConfig.Remove("m4_dpad_x");
+            VisualiseButton(activeButton, activeBinding, true);
+        }
+
+        private void TextRogDPadX_TextChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            AppConfig.Set("custom_m4_dpad_x", textRogDPadX.Text);
+        }
+
+        private void ComboRogDPadY_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            string action = comboRogDPadY.SelectedValue?.ToString() ?? "";
+            textRogDPadY.Visible = action == "custom";
+            if (action == "custom") textRogDPadY.Focus();
+            if (action != "") AppConfig.Set("m4_dpad_y", action);
+            else AppConfig.Remove("m4_dpad_y");
+            VisualiseButton(activeButton, activeBinding, true);
+        }
+
+        private void TextRogDPadY_TextChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m4") return;
+            AppConfig.Set("custom_m4_dpad_y", textRogDPadY.Text);
+        }
+
+        private void ComboRsX_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m1" && activeBinding != "m2") return;
+            string action = comboRsX.SelectedValue?.ToString() ?? "";
+            textRsX.Visible = action == "custom";
+            if (action == "custom") textRsX.Focus();
+            if (action != "") AppConfig.Set("m12_rs_x", action);
+            else AppConfig.Remove("m12_rs_x");
+            VisualiseButton(activeButton, activeBinding);
+        }
+
+        private void TextRsX_TextChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m1" && activeBinding != "m2") return;
+            AppConfig.Set("custom_m12_rs_x", textRsX.Text);
+        }
+
+        private void ComboRsY_SelectedValueChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m1" && activeBinding != "m2") return;
+            string action = comboRsY.SelectedValue?.ToString() ?? "";
+            textRsY.Visible = action == "custom";
+            if (action == "custom") textRsY.Focus();
+            if (action != "") AppConfig.Set("m12_rs_y", action);
+            else AppConfig.Remove("m12_rs_y");
+            VisualiseButton(activeButton, activeBinding);
+        }
+
+        private void TextRsY_TextChanged(object? sender, EventArgs e)
+        {
+            if (activeBinding != "m1" && activeBinding != "m2") return;
+            AppConfig.Set("custom_m12_rs_y", textRsY.Text);
+        }
 
         private void Controller_Complete(object? sender, EventArgs e)
         {

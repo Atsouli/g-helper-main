@@ -286,6 +286,7 @@ namespace GHelper
             buttonFHD.MouseLeave += ButtonScreen_MouseLeave;
 
             buttonExplorer.Click += ButtonExplorer_Click;
+            buttonUpdates.Click += ButtonUpdates_Click;
 
             sliderBattery.MouseUp += SliderBattery_MouseUp;
             sliderBattery.KeyUp += SliderBattery_KeyUp;
@@ -2209,6 +2210,12 @@ namespace GHelper
             Application.Exit();
         }
 
+        private void ButtonUpdates_Click(object? sender, EventArgs e)
+        {
+            var aboutForm = new AboutForm();
+            aboutForm.ShowDialog();
+        }
+
         /// <summary>
         /// Closes all forms except the settings. Hides the settings
         /// </summary>
@@ -2471,9 +2478,16 @@ namespace GHelper
 
                 if (Program.rtssOverlay?.Start() != true)
                 {
-                    MessageBox.Show(this,
-                        "RivaTuner Statistics Server was not found. Install RTSS, then try again.",
-                        "RTSS OSD", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (fromHotkey)
+                    {
+                        Program.toast.RunToast("RTSS not running", ToastIcon.MicrophoneMute);
+                    }
+                    else
+                    {
+                        MessageBox.Show(this,
+                            "RivaTuner Statistics Server was not found. Install RTSS, then try again.",
+                            "RTSS OSD", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     AppConfig.Set("rtss_overlay", 0);
                     buttonRtssOverlay.Activated = false;
                     SetContextMenu();

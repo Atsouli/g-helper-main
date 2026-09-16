@@ -51,7 +51,7 @@ namespace GHelper.Ally
         static int _upCount = 0;
         static int _downCount = 0;
 
-        static int tdpMin = 6;
+        static int tdpMin = 1;
         static int tdpStable = tdpMin;
         static int tdpCurrent = -1;
 
@@ -602,6 +602,29 @@ namespace GHelper.Ally
             settings.VisualiseBacklight(InputDispatcher.GetBacklight());
         }
 
+        public static Dictionary<string, string> SoftwareActionDummyMacros = new Dictionary<string, string>();
+        public static Dictionary<string, string> DummyMacroToSoftwareAction = new Dictionary<string, string>();
+
+        public static string GetDummyMacro(string action)
+        {
+            if (SoftwareActionDummyMacros.ContainsKey(action)) return SoftwareActionDummyMacros[action];
+
+            int index = SoftwareActionDummyMacros.Count;
+            if (index >= 26) return "00-00"; // Max 26 actions!
+            
+            byte[] ps2Codes = new byte[] {
+                0x1C, 0x32, 0x21, 0x23, 0x24, 0x2B, 0x34, 0x33, 
+                0x43, 0x3B, 0x42, 0x4B, 0x3A, 0x31, 0x44, 0x4D, 
+                0x15, 0x2D, 0x1B, 0x2C, 0x3C, 0x2A, 0x1D, 0x22, 
+                0x35, 0x1A
+            };
+            
+            string macro = $"04-04-8C-88-8A-{ps2Codes[index]:X2}";
+            SoftwareActionDummyMacros[action] = macro;
+            DummyMacroToSoftwareAction[macro] = action;
+            return macro;
+        }
+
         static private byte[] DecodeBinding(string binding = "")
         {
             byte[] bytes;
@@ -614,7 +637,16 @@ namespace GHelper.Ally
             }
             catch
             {
-                return new byte[2];
+                try 
+                {
+                    binding = GetDummyMacro(binding);
+                    if (binding == "00-00") return new byte[2];
+                    bytes = AppConfig.StringToBytes(binding);
+                }
+                catch
+                {
+                    return new byte[2];
+                }
             }
 
             byte[] code = new byte[10];

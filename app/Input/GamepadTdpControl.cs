@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using GHelper.Display;
 using GHelper.Helpers;
 using GHelper.Mode;
 
@@ -18,6 +19,9 @@ namespace GHelper.Input
         private const ushort DPadRight = 0x0008;
         private const ushort DPadUp = 0x0001;
         private const ushort DPadDown = 0x0002;
+        private const ushort LeftBumper = 0x0100;
+        private const ushort RightBumper = 0x0200;
+        private const ushort BumperButtons = LeftBumper | RightBumper;
         private const ushort HorizontalDirections = DPadLeft | DPadRight;
         private const ushort AllDirections = DPadUp | DPadDown | DPadLeft | DPadRight;
         private const byte TriggerThreshold = 180;
@@ -25,6 +29,8 @@ namespace GHelper.Input
         private const int TdpRepeatIntervalMs = 120;
         private const int FrequencyRepeatDelayMs = 450;
         private const int FrequencyRepeatIntervalMs = 140;
+        private const int BrightnessChordRepeatDelayMs = 450;
+        private const int BrightnessChordRepeatIntervalMs = 160;
         private const double MouseDeadzone = 0.16;
         private const double MouseSpeed = 26.0;
         private const uint MouseEventMove = 0x0001;
@@ -53,6 +59,8 @@ namespace GHelper.Input
         private ushort repeatingFrequencyDirection;
         private long nextFrequencyRepeatAt;
         private bool frequencyElevationRequested;
+        private ushort repeatingBrightnessChordBumper;
+        private long nextBrightnessChordRepeatAt;
         private readonly LowLevelKeyboardProc keyboardProc;
         private readonly LowLevelMouseProc mouseProc;
         private readonly HashSet<int> suppressedDesktopStickKeys = [];
@@ -121,6 +129,7 @@ namespace GHelper.Input
             }
 
             HandleFrequencyChord(gamepad, now);
+            HandleBrightnessChord(gamepad, now);
             HandlePaddleMouse(gamepad);
         }
 
@@ -146,14 +155,29 @@ namespace GHelper.Input
 
             if (direction != repeatingFrequencyDirection)
             {
-                AdjustFrequency(direction);
+                ExecuteDPadAction(direction);
                 repeatingFrequencyDirection = direction;
                 nextFrequencyRepeatAt = now + FrequencyRepeatDelayMs;
             }
             else if (now >= nextFrequencyRepeatAt)
             {
-                AdjustFrequency(direction);
+                ExecuteDPadAction(direction, isRepeat: true);
                 nextFrequencyRepeatAt = now + FrequencyRepeatIntervalMs;
+            }
+        }
+
+        private void ExecuteDPadAction(ushort direction, bool isRepeat = false)
+        {
+            string configKey = direction is DPadLeft or DPadRight ? "m4_dpad_x" : "m4_dpad_y";
+            string customAction = AppConfig.GetString(configKey);
+
+            if (string.IsNullOrWhiteSpace(customAction))
+            {
+                AdjustFrequency(direction);
+            }
+            else if (!isRepeat || customAction is "volume_up" or "volume_down" or "brightness_up" or "brightness_down" or "backlight_up" or "backlight_down")
+            {
+                InputDispatcher.RunCustomAction(customAction);
             }
         }
 
@@ -190,6 +214,61 @@ namespace GHelper.Input
         {
             repeatingFrequencyDirection = 0;
             frequencyElevationRequested = false;
+        }
+
+        private void HandleBrightnessChord(XInputGamepad gamepad, long now)
+        {
+            if (!InputDispatcher.isRogLongPressed)
+            {
+                repeatingBrightnessChordBumper = 0;
+                return;
+            }
+
+            ushort pressed = (ushort)(gamepad.Buttons & BumperButtons);
+            ushort bumper = (pressed & RightBumper) != 0 ? RightBumper :
+                (ushort)(pressed & LeftBumper);
+
+            if (bumper == 0)
+            {
+                repeatingBrightnessChordBumper = 0;
+                return;
+            }
+
+            if (bumper != repeatingBrightnessChordBumper)
+            {
+                string customAction = AppConfig.GetString(bumper == RightBumper ? "m4_rb" : "m4_lb");
+                if (!string.IsNullOrWhiteSpace(customAction))
+                {
+                    InputDispatcher.RunCustomAction(customAction);
+                }
+                else
+                {
+                    AdjustScreenBrightness(bumper == RightBumper ? 10 : -10);
+                }
+                repeatingBrightnessChordBumper = bumper;
+                nextBrightnessChordRepeatAt = now + BrightnessChordRepeatDelayMs;
+            }
+            else if (now >= nextBrightnessChordRepeatAt)
+            {
+                string customAction = AppConfig.GetString(bumper == RightBumper ? "m4_rb" : "m4_lb");
+                if (string.IsNullOrWhiteSpace(customAction))
+                {
+                    AdjustScreenBrightness(bumper == RightBumper ? 10 : -10);
+                }
+                else if (customAction is "volume_up" or "volume_down" or "brightness_up" or "brightness_down" or "backlight_up" or "backlight_down")
+                {
+                    // Only repeat volume/brightness related actions to prevent spamming apps or toggles
+                    InputDispatcher.RunCustomAction(customAction);
+                }
+                nextBrightnessChordRepeatAt = now + BrightnessChordRepeatIntervalMs;
+            }
+        }
+
+        private static void AdjustScreenBrightness(int delta)
+        {
+            int brightness = VisualControl.SetBrightness(delta: delta);
+            if (brightness >= 0)
+                Program.toast.RunToast(brightness + "%", delta > 0 ? ToastIcon.BrightnessUp : ToastIcon.BrightnessDown);
         }
 
         private IntPtr DesktopStickKeyboardHook(int code, IntPtr message, IntPtr data)
@@ -256,7 +335,15 @@ namespace GHelper.Input
                     long now = Environment.TickCount64;
                     if (Math.Abs(desktopMouseX) >= MouseGestureThreshold && now >= nextBrightnessAt)
                     {
-                        InputDispatcher.SetBrightness(desktopMouseX > 0);
+                        string action = AppConfig.GetString("m12_rs_x");
+                        if (string.IsNullOrWhiteSpace(action))
+                        {
+                            InputDispatcher.SetBrightness(desktopMouseX > 0);
+                        }
+                        else
+                        {
+                            InputDispatcher.RunCustomAction(action);
+                        }
                         desktopMouseX = 0;
                         nextBrightnessAt = now + BrightnessRepeatMs;
                     }
@@ -278,7 +365,15 @@ namespace GHelper.Input
                              now >= nextScrollAt &&
                              now - scrollDirectionChangedAt >= ScrollDirectionDebounceMs)
                     {
-                        QueueMouseWheel(direction * WheelDelta);
+                        string action = AppConfig.GetString("m12_rs_y");
+                        if (string.IsNullOrWhiteSpace(action))
+                        {
+                            QueueMouseWheel(direction * WheelDelta);
+                        }
+                        else
+                        {
+                            InputDispatcher.RunCustomAction(action);
+                        }
                         desktopMouseY = 0;
                         nextScrollAt = now + ScrollRepeatMs;
                     }

@@ -214,6 +214,9 @@ namespace GHelper.Input
                 hook.RegisterHotKey(keyModifierAlt, Keys.F6);
                 hook.RegisterHotKey(keyModifierAlt, Keys.F9);
                 hook.RegisterHotKey(ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt, Keys.F10);
+                
+                for (int i = 0; i < 26; i++)
+                    hook.RegisterHotKey(ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt, Keys.A + i);
             }
 
             // FN-Lock group
@@ -348,16 +351,46 @@ namespace GHelper.Input
 
             Logger.WriteLine(e.Key.ToString() + " " + e.Modifier.ToString());
 
-            if (AppConfig.IsAlly() && e.Key == Keys.F10 &&
-                e.Modifier == (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt))
+            if (e.Modifier == (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt) && AppConfig.IsAlly())
             {
-                // Let the firmware release the carrier modifiers before emitting Win+D.
-                Task.Run(async () =>
+                if (e.Key >= Keys.A && e.Key <= Keys.Z)
                 {
-                    await Task.Delay(120);
-                    KeyboardHook.KeyKeyPress(Keys.LWin, Keys.D);
-                });
-                return;
+                    int index = e.Key - Keys.A;
+                    byte[] ps2Codes = new byte[] {
+                        0x1C, 0x32, 0x21, 0x23, 0x24, 0x2B, 0x34, 0x33, 
+                        0x43, 0x3B, 0x42, 0x4B, 0x3A, 0x31, 0x44, 0x4D, 
+                        0x15, 0x2D, 0x1B, 0x2C, 0x3C, 0x2A, 0x1D, 0x22, 
+                        0x35, 0x1A
+                    };
+                    string macro = $"04-04-8C-88-8A-{ps2Codes[index]:X2}";
+                    if (GHelper.Ally.AllyControl.DummyMacroToSoftwareAction.TryGetValue(macro, out string action))
+                    {
+                        if (!ExecuteAction(action.Trim(), null)) RunKeyCommand(action.Trim());
+                    }
+                    return;
+                }
+
+                if (e.Key == Keys.F10)
+                {
+                    Program.toast.RunToast("Show Desktop");
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            Type shellType = Type.GetTypeFromProgID("Shell.Application");
+                            if (shellType != null)
+                            {
+                                object shellObject = Activator.CreateInstance(shellType);
+                                shellType.InvokeMember("ToggleDesktop", System.Reflection.BindingFlags.InvokeMethod, null, shellObject, null);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.WriteLine("Failed to toggle desktop: " + ex.Message);
+                        }
+                    });
+                    return;
+                }
             }
 
             if (e.Modifier == (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt)
@@ -676,8 +709,7 @@ namespace GHelper.Input
                 if (name == "cc_double" && ModeControl.IsAllyZ1Extreme())
                     action = "ally_frequency_toggle";
             }
-
-            ExecuteAction(action, name);
+            if (!ExecuteAction(action, name)) RunKeyCommand(action);
         }
 
         private static void HandleCcClick()
@@ -796,12 +828,15 @@ namespace GHelper.Input
             {
                 case "mute":
                     KeyboardHook.KeyPress(Keys.VolumeMute);
+                    Program.toast.RunToast(Audio.IsMuted() ? Properties.Strings.Muted : Properties.Strings.Unmuted);
                     return true;
                 case "volume_down":
                     KeyboardHook.KeyPress(Keys.VolumeDown);
+                    Program.toast.RunToast(Properties.Strings.VolumeDown, ToastIcon.BrightnessDown);
                     return true;
                 case "volume_up":
                     KeyboardHook.KeyPress(Keys.VolumeUp);
+                    Program.toast.RunToast(Properties.Strings.VolumeUp, ToastIcon.BrightnessUp);
                     return true;
                 case "backlight_down":
                     SetBacklight(-1);
@@ -811,9 +846,11 @@ namespace GHelper.Input
                     return true;
                 case "play":
                     KeyboardHook.KeyPress(Keys.MediaPlayPause);
+                    Program.toast.RunToast(Properties.Strings.PlayPause);
                     return true;
                 case "screenshot":
                     KeyboardHook.KeyPress(Keys.Snapshot);
+                    Program.toast.RunToast(Properties.Strings.PrintScreen);
                     return true;
                 case "lock":
                     Logger.WriteLine("Screen lock");
@@ -892,6 +929,7 @@ namespace GHelper.Input
                     return true;
                 case "calculator":
                     LaunchProcess("calc");
+                    Program.toast.RunToast("Calculator");
                     return true;
                 case "controller":
                     Program.settingsForm.BeginInvoke(Program.settingsForm.allyControl.ToggleModeHotkey);
@@ -1568,6 +1606,8 @@ namespace GHelper.Input
             if (string.IsNullOrEmpty(command)) return;
             try
             {
+                string displayName = Path.GetFileNameWithoutExtension(command);
+                Program.toast.RunToast(displayName);
                 RestrictedProcessHelper.RunAsRestrictedUser(command);
             }
             catch (Exception ex)

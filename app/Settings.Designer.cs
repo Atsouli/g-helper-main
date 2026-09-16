@@ -444,11 +444,13 @@ namespace GHelper
             // tableButtons
             // 
             tableButtons.AutoSize = true;
-            tableButtons.ColumnCount = 2;
-            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableButtons.Controls.Add(buttonExplorer, 0, 0);
-            tableButtons.Controls.Add(buttonQuit, 1, 0);
+            tableButtons.ColumnCount = 3;
+            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableButtons.Controls.Add(buttonUpdates, 0, 0);
+            tableButtons.Controls.Add(buttonExplorer, 1, 0);
+            tableButtons.Controls.Add(buttonQuit, 2, 0);
             tableButtons.Dock = DockStyle.Top;
             tableButtons.Location = new Point(20, 10);
             tableButtons.Margin = new Padding(8, 4, 8, 4);
@@ -532,7 +534,7 @@ namespace GHelper
             buttonUpdates.Secondary = true;
             buttonUpdates.Size = new Size(254, 48);
             buttonUpdates.TabIndex = 1;
-            buttonUpdates.Text = "&Updates";
+            buttonUpdates.Text = "&About / Docs";
             buttonUpdates.TextImageRelation = TextImageRelation.ImageBeforeText;
             buttonUpdates.UseVisualStyleBackColor = false;
             // 

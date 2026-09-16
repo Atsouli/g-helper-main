@@ -1,4 +1,4 @@
-﻿using GHelper;
+using GHelper;
 using GHelper.USB;
 using System.Collections.Concurrent;
 using System.Management;
@@ -171,7 +171,7 @@ public class AsusACPI
     public const int GPUModeStandard = 1;
     public const int GPUModeUltimate = 2;
 
-    public const int MinTotal = 5;
+    public const int MinTotal = 1;
 
     public static int MaxTotal = 150;
     public static int DefaultTotal = 80;
