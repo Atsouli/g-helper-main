@@ -100,14 +100,6 @@ namespace GHelper
 
             ButtonBinding("vb", "View", buttonView);
             ButtonBinding("mb", "Menu", buttonMenu);
-            ButtonBinding("ls_up", "LS Up", buttonLSU);
-            ButtonBinding("ls_down", "LS Down", buttonLSD);
-            ButtonBinding("ls_left", "LS Left", buttonLSL);
-            ButtonBinding("ls_right", "LS Right", buttonLSR);
-            ButtonBinding("rs_up", "RS Up", buttonRSU);
-            ButtonBinding("rs_down", "RS Down", buttonRSD);
-            ButtonBinding("rs_left", "RS Left", buttonRSL);
-            ButtonBinding("rs_right", "RS Right", buttonRSR);
 
             ComboBinding(comboPrimary);
             ComboBinding(comboSecondary);
@@ -240,14 +232,6 @@ namespace GHelper
             VisualiseButton(buttonLS, "ls");
             VisualiseButton(buttonView, "vb");
             VisualiseButton(buttonMenu, "mb");
-            VisualiseButton(buttonLSU, "ls_up");
-            VisualiseButton(buttonLSD, "ls_down");
-            VisualiseButton(buttonLSL, "ls_left");
-            VisualiseButton(buttonLSR, "ls_right");
-            VisualiseButton(buttonRSU, "rs_up");
-            VisualiseButton(buttonRSD, "rs_down");
-            VisualiseButton(buttonRSL, "rs_left");
-            VisualiseButton(buttonRSR, "rs_right");
 
             if (panelBinding.Visible && activeButton != null && !isSoftwareBinding(activeBinding))
             {

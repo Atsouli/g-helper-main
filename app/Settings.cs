@@ -1019,8 +1019,9 @@ namespace GHelper
 
         private void ConfigureSinglePageLayout()
         {
-            settingsTabs.HideSingleTabHeader = true;
-            tabPerformance.Text = "";
+            // --- Tab 1: System Overlay (main dashboard) ---
+            settingsTabs.HideSingleTabHeader = false;
+            tabPerformance.Text = "☑ SYSTEM OVERLAY";
             tabPerformance.AutoScroll = false;
             tabPerformance.Padding = new Padding(0);
 
@@ -1045,14 +1046,13 @@ namespace GHelper
             leftColumn.SuspendLayout();
             rightColumn.SuspendLayout();
 
-            // Controls are added bottom-to-top because every settings card is DockStyle.Top.
+            // Left: Performance Mode, Display Settings, Visual Mode, Audio & Controller
             leftColumn.Controls.AddRange([
-                panelMatrix, panelRearLight, panelKeyboard, panelGamma,
-                panelScreen, panelOrientation, panelGPU, panelPerformance
+                panelAlly, panelGamma, panelScreen, panelOrientation, panelGPU, panelPerformance
             ]);
+            // Right: System Health (battery), Shortcut Tiles, Footer
             rightColumn.Controls.AddRange([
-                panelFooter, panelCustomButtons, panelVersion, panelStartup,
-                panelPeripherals, panelAlly, panelBattery, panelController
+                panelFooter, panelCustomButtons, panelBattery, panelVersion
             ]);
 
             dashboard.Controls.Add(leftColumn, 0, 0);
@@ -1062,6 +1062,30 @@ namespace GHelper
             rightColumn.ResumeLayout(false);
             leftColumn.ResumeLayout(false);
             dashboard.ResumeLayout(false);
+
+            // --- Tab 2: OSD ---
+            tabDisplay.Text = "🖥 OSD";
+            tabDisplay.AutoScroll = true;
+            tabDisplay.Padding = new Padding(0);
+            tabDisplay.Controls.Clear();
+            Panel osdColumn = CreateSettingsColumn("settingsColumnOSD");
+            osdColumn.Controls.AddRange([
+                panelMatrix, panelRearLight, panelKeyboard
+            ]);
+            tabDisplay.Controls.Add(osdColumn);
+            settingsTabs.TabPages.Add(tabDisplay);
+
+            // --- Tab 3: Settings (wrench icon) ---
+            tabDevices.Text = "🛠";
+            tabDevices.AutoScroll = true;
+            tabDevices.Padding = new Padding(0);
+            tabDevices.Controls.Clear();
+            Panel configColumn = CreateSettingsColumn("settingsColumnConfig");
+            configColumn.Controls.AddRange([
+                panelController, panelPeripherals, panelStartup
+            ]);
+            tabDevices.Controls.Add(configColumn);
+            settingsTabs.TabPages.Add(tabDevices);
         }
 
         private static Panel CreateSettingsColumn(string name) => new()

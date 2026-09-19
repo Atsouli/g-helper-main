@@ -8,6 +8,12 @@ namespace GHelper
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private RCircularProgressBar progressBattery;
+        private Slider sliderVolume;
+        private Label labelVolume;
+        private RButton buttonMouseEmulation;
+        private Label labelMouseEmulation;
+
 
         /// <summary>
         /// Clean up any resources being used.
@@ -31,6 +37,12 @@ namespace GHelper
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            progressBattery = new GHelper.UI.RCircularProgressBar();
+            sliderVolume = new GHelper.UI.Slider();
+            labelVolume = new Label();
+            buttonMouseEmulation = new GHelper.UI.RButton();
+            labelMouseEmulation = new Label();
+
             toolTip = new ToolTip(components);
             settingsTabs = new RTabControl();
             tabPerformance = new RGlassTabPage();
@@ -425,7 +437,7 @@ namespace GHelper
             labelBatteryTitle.Name = "labelBatteryTitle";
             labelBatteryTitle.Size = new Size(400, 84);
             labelBatteryTitle.TabIndex = 37;
-            labelBatteryTitle.Text = "Battery Charge Limit";
+            labelBatteryTitle.Text = "❤ SYSTEM HEALTH";
             // 
             // panelFooter
             // 
@@ -447,8 +459,8 @@ namespace GHelper
             tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
             tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
             tableButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            tableButtons.Controls.Add(buttonUpdates, 0, 0);
-            tableButtons.Controls.Add(buttonExplorer, 1, 0);
+            tableButtons.Controls.Add(buttonExplorer, 0, 0);
+            tableButtons.Controls.Add(buttonDonate, 1, 0);
             tableButtons.Controls.Add(buttonQuit, 2, 0);
             tableButtons.Dock = DockStyle.Top;
             tableButtons.Location = new Point(20, 10);
@@ -476,7 +488,7 @@ namespace GHelper
             buttonDonate.Secondary = true;
             buttonDonate.Size = new Size(254, 48);
             buttonDonate.TabIndex = 3;
-            buttonDonate.Text = "&Donate";
+            buttonDonate.Text = "About";
             buttonDonate.TextImageRelation = TextImageRelation.ImageBeforeText;
             buttonDonate.UseVisualStyleBackColor = false;
             // 
@@ -495,7 +507,7 @@ namespace GHelper
             buttonQuit.Secondary = true;
             buttonQuit.Size = new Size(255, 48);
             buttonQuit.TabIndex = 2;
-            buttonQuit.Text = "&Quit";
+            buttonQuit.Text = "Quit";
             buttonQuit.TextAlign = ContentAlignment.MiddleRight;
             buttonQuit.TextImageRelation = TextImageRelation.ImageBeforeText;
             buttonQuit.UseVisualStyleBackColor = false;
@@ -514,7 +526,7 @@ namespace GHelper
             buttonExplorer.Secondary = true;
             buttonExplorer.Size = new Size(255, 48);
             buttonExplorer.TabIndex = 3;
-            buttonExplorer.Text = "Config Folder";
+            buttonExplorer.Text = "Configure";
             buttonExplorer.UseVisualStyleBackColor = false;
             // 
             // buttonUpdates
@@ -555,6 +567,7 @@ namespace GHelper
             panelPerformance.AccessibleRole = AccessibleRole.Grouping;
             panelPerformance.AutoSize = true;
             panelPerformance.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelPerformance.Controls.Add(labelCPUFan);
             panelPerformance.Controls.Add(tablePerf);
             panelPerformance.Controls.Add(panelCPUTitle);
             panelPerformance.Dock = DockStyle.Top;
@@ -672,15 +685,14 @@ namespace GHelper
             buttonFans.Secondary = true;
             buttonFans.Size = new Size(191, 120);
             buttonFans.TabIndex = 3;
-            buttonFans.Text = "&Fans + Power";
+            buttonFans.Text = "&Manual";
             buttonFans.TextImageRelation = TextImageRelation.ImageAboveText;
             buttonFans.UseVisualStyleBackColor = false;
             // 
             // panelCPUTitle
             // 
-            panelCPUTitle.Controls.Add(picturePerf);
             panelCPUTitle.Controls.Add(labelPerf);
-            panelCPUTitle.Controls.Add(labelCPUFan);
+            panelCPUTitle.Controls.Add(picturePerf);
             panelCPUTitle.Dock = DockStyle.Top;
             panelCPUTitle.Location = new Point(20, 20);
             panelCPUTitle.Margin = new Padding(4);
@@ -711,19 +723,20 @@ namespace GHelper
             labelPerf.Name = "labelPerf";
             labelPerf.Size = new Size(234, 32);
             labelPerf.TabIndex = 0;
-            labelPerf.Text = "Performance Mode";
+            labelPerf.Text = "⚡ PERFORMANCE MODE";
             // 
             // labelCPUFan
             // 
             labelCPUFan.AccessibleRole = AccessibleRole.TitleBar;
-            labelCPUFan.Dock = DockStyle.Right;
             labelCPUFan.Cursor = Cursors.Hand;
-            labelCPUFan.AutoSize = true;
-            labelCPUFan.Margin = new Padding(8, 0, 8, 0);
+            labelCPUFan.AutoSize = false;
+            labelCPUFan.Dock = DockStyle.Bottom;
+            labelCPUFan.Height = 40;
+            labelCPUFan.Margin = new Padding(8, 8, 8, 8);
             labelCPUFan.Name = "labelCPUFan";
-                        labelCPUFan.TabIndex = 33;
+            labelCPUFan.TabIndex = 33;
             labelCPUFan.Text = "      ";
-            labelCPUFan.TextAlign = ContentAlignment.TopRight;
+            labelCPUFan.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // panelGPU
             // 
@@ -1285,7 +1298,7 @@ namespace GHelper
             labelSreen.Name = "labelSreen";
             labelSreen.Size = new Size(176, 32);
             labelSreen.TabIndex = 26;
-            labelSreen.Text = "Screen";
+            labelSreen.Text = "□ DISPLAY SETTINGS";
             // 
             // panelKeyboard
             // 
@@ -1447,7 +1460,7 @@ namespace GHelper
             labelKeyboard.Name = "labelKeyboard";
             labelKeyboard.Size = new Size(210, 32);
             labelKeyboard.TabIndex = 34;
-            labelKeyboard.Text = "Laptop Keyboard";
+            labelKeyboard.Text = "⌨ KEYBOARD";
             // 
             // panelRearLight
             // 
@@ -1543,7 +1556,7 @@ namespace GHelper
             labelRearLight.Name = "labelRearLight";
             labelRearLight.Size = new Size(120, 32);
             labelRearLight.TabIndex = 34;
-            labelRearLight.Text = "Rear Light";
+            labelRearLight.Text = "💡 REAR LIGHT";
             // 
             // pictureRearLight
             // 
@@ -1686,23 +1699,47 @@ namespace GHelper
             buttonPeripheral1.Text = "Mouse 1";
             buttonPeripheral1.TextImageRelation = TextImageRelation.ImageBeforeText;
             buttonPeripheral1.UseVisualStyleBackColor = false;
-            // 
-            // panelAlly
-            // 
+                        // panelAlly
             panelAlly.AccessibleRole = AccessibleRole.Grouping;
-            panelAlly.AutoSize = true;
-            panelAlly.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            panelAlly.Controls.Add(tableLayoutAlly);
+            panelAlly.AutoSize = false;
+            panelAlly.Controls.Add(labelVolume);
+            panelAlly.Controls.Add(sliderVolume);
+            panelAlly.Controls.Add(labelAlly);
+            panelAlly.Controls.Add(buttonMouseEmulation);
+            panelAlly.Controls.Add(labelMouseEmulation);
             panelAlly.Controls.Add(panelAllyTitle);
             panelAlly.Dock = DockStyle.Top;
             panelAlly.Location = new Point(11, 1254);
             panelAlly.Margin = new Padding(0);
             panelAlly.Name = "panelAlly";
             panelAlly.Padding = new Padding(10, 20, 10, 0);
-            panelAlly.Size = new Size(440, 140);
+            panelAlly.Size = new Size(440, 200);
             panelAlly.TabIndex = 5;
             panelAlly.TabStop = true;
-            panelAlly.Visible = false;
+            panelAlly.Visible = true;
+            // labelVolume
+            labelVolume.Text = "System Volume                        Volume: 80%";
+            labelVolume.Dock = DockStyle.Top;
+            labelVolume.Height = 25;
+            // sliderVolume
+            sliderVolume.Dock = DockStyle.Top;
+            sliderVolume.Height = 40;
+            // labelAlly (Controller: Connected)
+            labelAlly.Text = "🎮    Controller: Connected";
+            labelAlly.ForeColor = Color.MediumSeaGreen;
+            labelAlly.Dock = DockStyle.Top;
+            labelAlly.Height = 40;
+            labelAlly.TextAlign = ContentAlignment.MiddleLeft;
+            // labelMouseEmulation
+            labelMouseEmulation.Text = "Mouse Emulation";
+            labelMouseEmulation.Dock = DockStyle.Left;
+            labelMouseEmulation.Width = 300;
+            labelMouseEmulation.TextAlign = ContentAlignment.MiddleLeft;
+            // buttonMouseEmulation
+            buttonMouseEmulation.Text = "⚪";
+            buttonMouseEmulation.Dock = DockStyle.Right;
+            buttonMouseEmulation.Width = 60;
+            
             // 
             // tableLayoutAlly
             // 
@@ -1833,7 +1870,7 @@ namespace GHelper
             labelAlly.Name = "labelAlly";
             labelAlly.Size = new Size(181, 32);
             labelAlly.TabIndex = 26;
-            labelAlly.Text = "Ally Controller";
+            labelAlly.Text = "🎮 AUDIO & CONTROLLER";
             // 
             // panelGamma
             // 
@@ -1869,22 +1906,22 @@ namespace GHelper
             // 
             tableVisual.AutoSize = true;
             tableVisual.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            tableVisual.ColumnCount = 4;
-            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableVisual.Controls.Add(buttonInstallColor, 0, 0);
+            tableVisual.ColumnCount = 3;
+            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3F));
+            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3F));
+            tableVisual.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.3F));
             tableVisual.Controls.Add(comboVisual, 0, 0);
             tableVisual.Controls.Add(comboResolution, 1, 0);
             tableVisual.Controls.Add(comboColorTemp, 2, 0);
-            tableVisual.Controls.Add(comboGamut, 3, 0);
+            tableVisual.Controls.Add(comboKeyboard, 0, 1);
+            tableVisual.Controls.Add(buttonKeyboardColor, 1, 1);
+            tableVisual.Controls.Add(buttonKeyboard, 2, 1);
             tableVisual.Dock = DockStyle.Top;
             tableVisual.Location = new Point(20, 91);
             tableVisual.Margin = new Padding(8, 4, 8, 4);
             tableVisual.Name = "tableVisual";
             tableVisual.Padding = new Padding(3, 0, 3, 0);
-            tableVisual.RowCount = 1;
+            tableVisual.RowCount = 2;
             tableVisual.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableVisual.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableVisual.Size = new Size(400, 79);
@@ -2029,7 +2066,7 @@ namespace GHelper
             labelGammaTitle.Name = "labelGammaTitle";
             labelGammaTitle.Size = new Size(540, 32);
             labelGammaTitle.TabIndex = 37;
-            labelGammaTitle.Text = "Flicker-free Dimming";
+            labelGammaTitle.Text = "✨ VISUAL MODE";
             // 
             // panelCustomButtons
             // 
@@ -2066,7 +2103,6 @@ namespace GHelper
             // 
             // panelCustomButtonsTitle
             // 
-            panelCustomButtonsTitle.Controls.Add(buttonAddCustom);
             panelCustomButtonsTitle.Controls.Add(labelCustomButtons);
             panelCustomButtonsTitle.Dock = DockStyle.Top;
             panelCustomButtonsTitle.Location = new Point(14, 12);
@@ -2082,14 +2118,14 @@ namespace GHelper
             buttonAddCustom.BackColor = SystemColors.ControlLight;
             buttonAddCustom.BorderColor = Color.Transparent;
             buttonAddCustom.BorderRadius = 8;
-            buttonAddCustom.Dock = DockStyle.Right;
+            buttonAddCustom.Dock = DockStyle.Top;
             buttonAddCustom.FlatAppearance.BorderSize = 0;
             buttonAddCustom.FlatStyle = FlatStyle.Flat;
             buttonAddCustom.Location = new Point(300, 3);
             buttonAddCustom.Margin = new Padding(0);
             buttonAddCustom.Name = "buttonAddCustom";
             buttonAddCustom.Secondary = true;
-            buttonAddCustom.Size = new Size(128, 40);
+            buttonAddCustom.Size = new Size(400, 48);
             buttonAddCustom.TabIndex = 1;
             buttonAddCustom.Text = "+  Add";
             buttonAddCustom.UseVisualStyleBackColor = false;
@@ -2105,7 +2141,7 @@ namespace GHelper
             labelCustomButtons.Padding = new Padding(8, 4, 0, 0);
             labelCustomButtons.Size = new Size(168, 40);
             labelCustomButtons.TabIndex = 0;
-            labelCustomButtons.Text = "Shortcut tiles";
+            labelCustomButtons.Text = "⊞ SHORTCUT TILES";
             // 
             // panelVersion
             // 
@@ -2114,7 +2150,6 @@ namespace GHelper
             panelVersion.Controls.Add(buttonEnergySaver);
             panelVersion.Controls.Add(buttonAmdOled);
             panelVersion.Controls.Add(buttonArmoury);
-            panelVersion.Controls.Add(labelVersion);
             panelVersion.Dock = DockStyle.Top;
             panelVersion.Location = new Point(11, 1837);
             panelVersion.MinimumSize = new Size(0, 50);

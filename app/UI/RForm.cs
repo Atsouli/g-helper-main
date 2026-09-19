@@ -69,14 +69,16 @@ namespace GHelper.UI
 
             if (darkTheme)
             {
-                // OLED True-Black theme
-                buttonMain = Color.FromArgb(255, 12, 12, 12);
-                buttonSecond = Color.FromArgb(255, 18, 18, 18);
+                // Acrylic dark theme matching screenshot (Must be solid colors for WinForms Controls)
+                buttonMain = Color.FromArgb(255, 30, 33, 41);
+                buttonSecond = Color.FromArgb(255, 20, 22, 28);
 
-                formBack = Color.Black; // Pure black for OLED
+                // WinForms does not support translucent background colors! It will crash with ArgumentException.
+                // We must use a solid color and rely on Form.Opacity or DWM APIs for the glass effect.
+                formBack = Color.FromArgb(255, 10, 10, 12); 
                 foreMain = Color.White;
-                borderMain = Color.FromArgb(255, 45, 45, 45);
-                borderSecond = Color.FromArgb(255, 30, 30, 30);
+                borderMain = Color.FromArgb(255, 60, 60, 60);
+                borderSecond = Color.FromArgb(255, 45, 45, 45);
 
                 chartMain = Color.Black;
                 chartGrid = Color.FromArgb(255, 50, 50, 50);

@@ -41,12 +41,12 @@ namespace GHelper.Overlay
             modeName = AllyControl.ActiveMappingModeName;
 
             Screen screen = Screen.PrimaryScreen ?? Screen.FromPoint(Cursor.Position);
-            int width = Math.Min(1040, screen.WorkingArea.Width - 32);
-            int height = Math.Min(680, screen.WorkingArea.Height - 32);
-            Size = new Size(Math.Max(720, width), Math.Max(500, height));
+            int width = Math.Min(860, screen.WorkingArea.Width - 32);
+            int height = Math.Min(520, screen.WorkingArea.Height - 32);
+            Size = new Size(width, height);
             Location = new Point(
                 screen.WorkingArea.Left + (screen.WorkingArea.Width - Width) / 2,
-                screen.WorkingArea.Top + (screen.WorkingArea.Height - Height) / 2);
+                screen.WorkingArea.Bottom - Height - 30);
 
             Show();
             Invalidate();
@@ -74,12 +74,12 @@ namespace GHelper.Overlay
             Color borderColor = _activeMode == PreviewMode.ROG ? BorderROG : BorderM2;
 
             Rectangle outer = new(1, 1, Width - 3, Height - 3);
-            using GraphicsPath outerPath = Drawing.RoundedRect(outer, 22);
+            using GraphicsPath outerPath = Drawing.RoundedRect(outer, 14);
             using LinearGradientBrush background = new(outer,
-                Color.FromArgb(246, 18, 25, 38), Color.FromArgb(246, 8, 13, 23),
+                Color.FromArgb(246, 30, 33, 41), Color.FromArgb(246, 18, 21, 28),
                 LinearGradientMode.Vertical);
             g.FillPath(background, outerPath);
-            using Pen border = new(borderColor, 2f);
+            using Pen border = new(Color.FromArgb(80, 255, 255, 255), 1.2f);
             g.DrawPath(border, outerPath);
 
             string title = _activeMode == PreviewMode.ROG
@@ -111,7 +111,7 @@ namespace GHelper.Overlay
             string hint = _activeMode == PreviewMode.ROG
                 ? "Release the ROG button to close"
                 : "Release to close";
-            using Font hintFont = new("Segoe UI", 8.5f);
+            using Font hintFont = new("Segoe UI", 11f);
             using Brush hintBrush = new SolidBrush(Color.FromArgb(145, 165, 183));
             SizeF hintSize = g.MeasureString(hint, hintFont);
             g.DrawString(hint, hintFont, hintBrush, (Width - hintSize.Width) / 2f, Height - 24);
@@ -123,7 +123,7 @@ namespace GHelper.Overlay
         {
             DrawAllyImage(g, AccentROG);
 
-            Rectangle screen = new(352, 120, 296, 236);
+            Rectangle screen = new(330, 280, 340, 255);
             DrawScreenPanel(g, screen);
             DrawRogShortcutPanel(g, screen);
 
@@ -136,7 +136,7 @@ namespace GHelper.Overlay
         {
             DrawAllyImage(g, AccentM2);
 
-            Rectangle screen = new(352, 120, 296, 236);
+            Rectangle screen = new(330, 280, 340, 255);
             DrawScreenPanel(g, screen);
             DrawM2ShortcutPanel(g, screen);
 
@@ -145,47 +145,37 @@ namespace GHelper.Overlay
 
         private void DrawControllerCallouts(Graphics g)
         {
-            Color triggers = Color.FromArgb(255, 87, 87);   // Red
-            Color sticks = Color.FromArgb(255, 204, 0);     // Yellow
-            Color dpad = Color.FromArgb(0, 210, 255);       // Cyan
-            Color face = Color.FromArgb(0, 225, 125);       // Green
-            Color misc = Color.FromArgb(180, 150, 255);     // Purple
+            Color triggers = Color.FromArgb(255, 87, 87);
+            Color sticks = Color.FromArgb(255, 204, 0);
+            Color dpad = Color.FromArgb(0, 210, 255);
+            Color face = Color.FromArgb(0, 225, 125);
+            Color misc = Color.FromArgb(180, 150, 255);
 
             // --- Left side ---
-            // LT and LB on same line
-            DrawCallout(g, "LT", new(125, 95), new RectangleF(5, 20, 170, 43), triggers);
-            DrawCallout(g, "LB", new(235, 115), new RectangleF(180, 20, 170, 43), triggers);
-
-            // L3
-            DrawCallout(g, "L3", new(135, 235), new RectangleF(92, 75, 170, 43), sticks);
-
-            // D-Pad cross layout
-            DrawCallout(g, "D-Pad Up", new(190, 315), new RectangleF(92, 130, 170, 43), dpad);
-            DrawCallout(g, "D-Pad Left", new(155, 350), new RectangleF(5, 185, 170, 43), dpad);
-            DrawCallout(g, "D-Pad Right", new(225, 350), new RectangleF(180, 185, 170, 43), dpad);
-            DrawCallout(g, "D-Pad Down", new(190, 385), new RectangleF(92, 240, 170, 43), dpad);
+            DrawCallout(g, "LT", new(125, 95), new RectangleF(5, 15, 190, 60), triggers);
+            DrawCallout(g, "LB", new(235, 115), new RectangleF(200, 15, 190, 60), triggers);
+            DrawCallout(g, "D-Pad Up", new(190, 315), new RectangleF(102, 80, 190, 60), dpad);
+            DrawCallout(g, "D-Pad Left", new(155, 350), new RectangleF(5, 145, 190, 60), dpad);
+            DrawCallout(g, "D-Pad Right", new(225, 350), new RectangleF(200, 145, 190, 60), dpad);
+            DrawCallout(g, "D-Pad Down", new(190, 385), new RectangleF(102, 210, 190, 60), dpad);
+            DrawCallout(g, "L3", new(135, 235), new RectangleF(102, 275, 190, 60), sticks);
 
             // --- Right side ---
-            // RT and RB on same line
-            DrawCallout(g, "RB", new(765, 115), new RectangleF(650, 20, 170, 43), triggers);
-            DrawCallout(g, "RT", new(875, 95), new RectangleF(825, 20, 170, 43), triggers);
-
-            // Face buttons diamond layout
-            DrawCallout(g, "Y", new(810, 200), new RectangleF(737, 75, 170, 43), face);
-            DrawCallout(g, "X", new(770, 240), new RectangleF(650, 130, 170, 43), face);
-            DrawCallout(g, "B", new(850, 240), new RectangleF(825, 130, 170, 43), face);
-            DrawCallout(g, "A", new(810, 280), new RectangleF(737, 185, 170, 43), face);
-
-            // R3 at last
-            DrawCallout(g, "R3", new(865, 350), new RectangleF(737, 240, 170, 43), sticks);
+            DrawCallout(g, "RB", new(765, 115), new RectangleF(610, 15, 190, 60), triggers);
+            DrawCallout(g, "RT", new(875, 95), new RectangleF(805, 15, 190, 60), triggers);
+            DrawCallout(g, "Y", new(810, 200), new RectangleF(707, 80, 190, 60), face);
+            DrawCallout(g, "X", new(770, 240), new RectangleF(610, 145, 190, 60), face);
+            DrawCallout(g, "B", new(850, 240), new RectangleF(805, 145, 190, 60), face);
+            DrawCallout(g, "A", new(810, 280), new RectangleF(707, 210, 190, 60), face);
+            DrawCallout(g, "R3", new(865, 350), new RectangleF(707, 275, 190, 60), sticks);
 
             // --- Top center buttons ---
-            DrawCallout(g, "View", new PointF(260, 160), new RectangleF(352, 70, 130, 43), misc);
-            DrawCallout(g, "Menu", new PointF(740, 160), new RectangleF(518, 70, 130, 43), misc);
+            DrawCallout(g, "View", new PointF(260, 160), new RectangleF(395, 15, 105, 60), misc);
+            DrawCallout(g, "Menu", new PointF(740, 160), new RectangleF(505, 15, 105, 60), misc);
 
-            // --- Bottom center buttons ---
-            DrawCallout(g, "M1", new PointF(330, 205), new RectangleF(360, 477, 130, 43), misc);
-            DrawCallout(g, "M2", new PointF(670, 205), new RectangleF(510, 477, 130, 43), misc);
+            // --- Bottom corners (M1/M2) ---
+            DrawCallout(g, "M1", new PointF(330, 205), new RectangleF(5, 477, 190, 60), misc);
+            DrawCallout(g, "M2", new PointF(670, 205), new RectangleF(805, 477, 190, 60), misc);
         }
 
         // ---------- Shared drawing helpers ----------
@@ -217,11 +207,11 @@ namespace GHelper.Overlay
 
         private static void DrawScreenPanel(Graphics g, Rectangle screen)
         {
-            using GraphicsPath screenPath = Drawing.RoundedRect(screen, 13);
+            using GraphicsPath screenPath = Drawing.RoundedRect(screen, 14);
             using LinearGradientBrush screenBrush = new(screen,
-                Color.FromArgb(220, 12, 31, 47), Color.FromArgb(240, 7, 15, 27),
-                LinearGradientMode.ForwardDiagonal);
-            using Pen screenBorder = new(Color.FromArgb(150, 55, 199, 255), 2f);
+                Color.FromArgb(205, 48, 52, 61), Color.FromArgb(175, 30, 33, 41),
+                LinearGradientMode.Vertical);
+            using Pen screenBorder = new(Color.FromArgb(105, 255, 255, 255), 1.2f);
             g.FillPath(screenBrush, screenPath);
             g.DrawPath(screenBorder, screenPath);
         }
@@ -381,14 +371,17 @@ namespace GHelper.Overlay
             PointF lineEnd = ConnectorEnd(anchor, box);
             DrawConnector(g, anchor, lineEnd, accent);
 
-            using GraphicsPath path = Drawing.RoundedRect(Rectangle.Round(box), 9);
-            using Brush fill = new SolidBrush(Color.FromArgb(225, 25, 35, 50));
-            using Pen outline = new(Color.FromArgb(125, accent.R / 2, accent.G / 2, accent.B / 2 + 30), 1f);
-            g.FillPath(fill, path);
+            Rectangle boxRect = Rectangle.Round(box);
+            using GraphicsPath path = Drawing.RoundedRect(boxRect, 14);
+            using LinearGradientBrush glassFill = new(boxRect,
+                Color.FromArgb(205, 48, 52, 61), Color.FromArgb(175, 30, 33, 41),
+                LinearGradientMode.Vertical);
+            using Pen outline = new(Color.FromArgb(105, 255, 255, 255), 1.2f);
+            g.FillPath(glassFill, path);
             g.DrawPath(outline, path);
 
-            using Font inputFont = new("Segoe UI Semibold", 8f, FontStyle.Bold);
-            using Font actionFont = new("Segoe UI", 8.5f);
+            using Font inputFont = new("Segoe UI Semibold", 10.5f, FontStyle.Bold);
+            using Font actionFont = new("Segoe UI", 11f);
             using Brush inputBrush = new SolidBrush(accent);
             using Brush actionBrush = new SolidBrush(Color.FromArgb(242, 247, 252));
             using StringFormat format = new() { Trimming = StringTrimming.EllipsisCharacter };
@@ -406,7 +399,7 @@ namespace GHelper.Overlay
             }
 
             g.DrawString(text, actionFont, actionBrush,
-                new RectangleF(box.X + 9, box.Y + 20, box.Width - 18, 17), format);
+                new RectangleF(box.X + 9, box.Y + 20, box.Width - 18, 35), format);
         }
 
         private static void DrawChordCallout(Graphics g, string label, string action, PointF anchor, RectangleF box, Color accent)
@@ -414,20 +407,23 @@ namespace GHelper.Overlay
             PointF lineEnd = ConnectorEnd(anchor, box);
             DrawConnector(g, anchor, lineEnd, accent);
 
-            using GraphicsPath path = Drawing.RoundedRect(Rectangle.Round(box), 9);
-            using Brush fill = new SolidBrush(Color.FromArgb(225, 25, 35, 50));
-            using Pen outline = new(Color.FromArgb(125, accent.R / 2, accent.G / 2, accent.B / 2 + 30), 1f);
-            g.FillPath(fill, path);
+            Rectangle boxRect = Rectangle.Round(box);
+            using GraphicsPath path = Drawing.RoundedRect(boxRect, 14);
+            using LinearGradientBrush glassFill = new(boxRect,
+                Color.FromArgb(205, 48, 52, 61), Color.FromArgb(175, 30, 33, 41),
+                LinearGradientMode.Vertical);
+            using Pen outline = new(Color.FromArgb(105, 255, 255, 255), 1.2f);
+            g.FillPath(glassFill, path);
             g.DrawPath(outline, path);
 
-            using Font labelFont = new("Segoe UI Semibold", 8f, FontStyle.Bold);
-            using Font actionFont = new("Segoe UI", 8.5f);
+            using Font labelFont = new("Segoe UI Semibold", 10.5f, FontStyle.Bold);
+            using Font actionFont = new("Segoe UI", 11f);
             using Brush labelBrush = new SolidBrush(accent);
             using Brush actionBrush = new SolidBrush(Color.FromArgb(242, 247, 252));
             using StringFormat format = new() { Trimming = StringTrimming.EllipsisCharacter };
             g.DrawString(label, labelFont, labelBrush, box.X + 9, box.Y + 4);
             g.DrawString(action, actionFont, actionBrush,
-                new RectangleF(box.X + 9, box.Y + 20, box.Width - 18, 17), format);
+                new RectangleF(box.X + 9, box.Y + 20, box.Width - 18, 35), format);
         }
 
         private static PointF ConnectorEnd(PointF anchor, RectangleF box)

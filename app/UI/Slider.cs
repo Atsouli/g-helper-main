@@ -1,4 +1,4 @@
-﻿using System.Drawing.Drawing2D;
+using System.Drawing.Drawing2D;
 
 namespace GHelper.UI
 {
@@ -39,7 +39,7 @@ namespace GHelper.UI
         private readonly System.Windows.Forms.Timer _animTimer = new() { Interval = 30 };
 
 
-        public Color accentColor = Color.FromArgb(255, 58, 174, 239);
+        public Color accentColor = Color.FromArgb(255, 218, 80, 200);
         public Color borderColor = Color.White;
 
         public List<int> supportedValues = new();
